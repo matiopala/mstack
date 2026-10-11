@@ -29,6 +29,11 @@ with Codex, Pi, and Claude Code.
 | [`show-me`](skills/show-me/SKILL.md) | Get a focused visual explanation. |
 | [`tech-spec`](skills/tech-spec/SKILL.md) | Describe how a feature should work technically and how to prove it works. |
 
+`deliver` ties together `grill-me`, `research`, `plan`, and `implement`.
+I can also use each stage on its own. `implement` includes verification,
+and the stages reuse the same task record when there is one. `deliver` also
+uses `design-review` and `blast-radius` when the change warrants them.
+
 ## Credits
 
 - `blast-radius` is adapted from
@@ -73,13 +78,11 @@ Or pick individual skills:
 ./scripts/install conventional-commits
 ```
 
-`product-spec`, `tech-spec`, `decompose`, `deliver`, and `grill-me` use `adr`
-to record important decisions. Installing any of them also installs `adr`.
-If you copy skill folders manually, include it too. For `grill-me`, decision
-capture only applies to software interviews in a repository.
-
-The standalone `research`, `plan`, and `implement` stages also use `adr`;
-the installer includes it when selecting these skills.
+Installing `deliver` includes `grill-me`, `research`, `plan`, and `implement`.
+It also includes `design-review`, `blast-radius`, and their `bro` companion.
+These stages, along with `product-spec`, `tech-spec`, and `decompose`, use `adr`
+to record important decisions, so the installer includes it too. For `grill-me`,
+decision capture only applies to software interviews in a repository.
 
 `blast-radius` and `design-review` use `bro` to explain findings in plain language.
 The installer includes `bro` when selecting these skills.
