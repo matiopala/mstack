@@ -15,6 +15,7 @@ with Codex, Pi, and Claude Code.
 | Skill | What I use it for |
 | --- | --- |
 | [`adr`](skills/adr/SKILL.md) | Keep track of important decisions, their reasoning, and later changes. |
+| [`blast-radius`](skills/blast-radius/SKILL.md) | Check what a change could break elsewhere, with concrete evidence and a plain-language explanation. |
 | [`bro`](skills/bro/SKILL.md) | Get a simpler version of the previous answer. |
 | [`conventional-commits`](skills/conventional-commits/SKILL.md) | Prepare focused Git commits with clear Conventional Commit messages. |
 | [`decompose`](skills/decompose/SKILL.md) | Split a bigger design into reviewable tasks with clear acceptance criteria and proof of completion. |
@@ -27,6 +28,8 @@ with Codex, Pi, and Claude Code.
 
 ## Credits
 
+- `blast-radius` is adapted from
+  [pstack's blast-radius](https://github.com/cursor/plugins/blob/main/pstack/skills/blast-radius/SKILL.md).
 - `bro` is adapted from [backnotprop/bro](https://github.com/backnotprop/bro).
 - `grill-me` is adapted from [Matt Pocock's skills](https://github.com/mattpocock/skills).
 - `show-me` is inspired by [HumanLayer's show-me](https://github.com/humanlayer/skills/tree/main/plugins/show-me).
@@ -70,7 +73,7 @@ to record important decisions. Installing any of them also installs `adr`.
 If you copy skill folders manually, include it too. For `grill-me`, decision
 capture only applies to software interviews in a repository.
 
-`design-review` uses `bro` to explain findings in plain language.
+`blast-radius` and `design-review` use `bro` to explain findings in plain language.
 The installer includes `bro` when selecting these skills.
 If you copy skill folders manually, include their companions too.
 
