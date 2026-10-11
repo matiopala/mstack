@@ -59,7 +59,7 @@ fi
 # Include the shared skills used by selected workflows.
 for skill_name in $selected_skills; do
   case "$skill_name" in
-    product-spec|tech-spec|decompose|deliver|grill-me|research)
+    product-spec|tech-spec|decompose|deliver|grill-me|research|plan)
       companion_skills=adr
       ;;
     blast-radius|design-review) companion_skills=bro ;;
