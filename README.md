@@ -22,6 +22,7 @@ with Codex, Pi, and Claude Code.
 | [`deliver`](skills/deliver/SKILL.md) | Work through questions, research, planning, and implementation, then collect irrefutable proof of delivery. |
 | [`design-review`](skills/design-review/SKILL.md) | Challenge a proposed solution and get concrete findings in plain language. |
 | [`grill-me`](skills/grill-me/SKILL.md) | Get interviewed about an idea, surface assumptions, and clarify what I actually want. |
+| [`implement`](skills/implement/SKILL.md) | Implement a defined change and prove it meets acceptance and regression checks. |
 | [`plan`](skills/plan/SKILL.md) | Define the approach, acceptance checks, and irrefutable proof for a software change. |
 | [`product-spec`](skills/product-spec/SKILL.md) | Define the user problem, desired outcome, and what success looks like. |
 | [`research`](skills/research/SKILL.md) | Investigate specific software questions and identify constraints, regression risks, and verification options. |
@@ -35,10 +36,10 @@ with Codex, Pi, and Claude Code.
 - `bro` is adapted from [backnotprop/bro](https://github.com/backnotprop/bro).
 - `grill-me` is adapted from [Matt Pocock's skills](https://github.com/mattpocock/skills).
 - `show-me` is inspired by [HumanLayer's show-me](https://github.com/humanlayer/skills/tree/main/plugins/show-me).
-- `deliver` and its extracted `research` and `plan` stages draw on
+- `deliver` and its extracted `research`, `plan`, and `implement` stages draw on
   [HumanLayer's research-plan-implement workflow](https://github.com/humanlayer/humanlayer/tree/main/.claude/commands).
-  The interview stage uses `grill-me`. Flow tracing also borrows from
-  [pstack](https://github.com/cursor/plugins/tree/main/pstack).
+  The interview stage uses `grill-me`. Flow tracing, debugging, and verification
+  also borrow from [pstack](https://github.com/cursor/plugins/tree/main/pstack).
 - `design-review` adapts the review approach from
   [pstack's interrogate](https://github.com/cursor/plugins/blob/main/pstack/skills/interrogate/SKILL.md).
 
@@ -77,7 +78,7 @@ to record important decisions. Installing any of them also installs `adr`.
 If you copy skill folders manually, include it too. For `grill-me`, decision
 capture only applies to software interviews in a repository.
 
-The standalone `research` and `plan` stages also use `adr`;
+The standalone `research`, `plan`, and `implement` stages also use `adr`;
 the installer includes it when selecting these skills.
 
 `blast-radius` and `design-review` use `bro` to explain findings in plain language.
