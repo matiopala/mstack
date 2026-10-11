@@ -23,6 +23,7 @@ with Codex, Pi, and Claude Code.
 | [`design-review`](skills/design-review/SKILL.md) | Challenge a proposed solution and get concrete findings in plain language. |
 | [`grill-me`](skills/grill-me/SKILL.md) | Get interviewed about an idea, surface assumptions, and clarify what I actually want. |
 | [`product-spec`](skills/product-spec/SKILL.md) | Define the user problem, desired outcome, and what success looks like. |
+| [`research`](skills/research/SKILL.md) | Investigate specific software questions and identify constraints, regression risks, and verification options. |
 | [`show-me`](skills/show-me/SKILL.md) | Get a focused visual explanation. |
 | [`tech-spec`](skills/tech-spec/SKILL.md) | Describe how a feature should work technically and how to prove it works. |
 
@@ -33,8 +34,10 @@ with Codex, Pi, and Claude Code.
 - `bro` is adapted from [backnotprop/bro](https://github.com/backnotprop/bro).
 - `grill-me` is adapted from [Matt Pocock's skills](https://github.com/mattpocock/skills).
 - `show-me` is inspired by [HumanLayer's show-me](https://github.com/humanlayer/skills/tree/main/plugins/show-me).
-- `deliver` draws on Matt Pocock's `grill-me` and
+- `deliver` and its extracted `research` stage draw on
   [HumanLayer's research-plan-implement workflow](https://github.com/humanlayer/humanlayer/tree/main/.claude/commands).
+  The interview stage uses `grill-me`. Flow tracing also borrows from
+  [pstack](https://github.com/cursor/plugins/tree/main/pstack).
 - `design-review` adapts the review approach from
   [pstack's interrogate](https://github.com/cursor/plugins/blob/main/pstack/skills/interrogate/SKILL.md).
 
@@ -72,6 +75,9 @@ Or pick individual skills:
 to record important decisions. Installing any of them also installs `adr`.
 If you copy skill folders manually, include it too. For `grill-me`, decision
 capture only applies to software interviews in a repository.
+
+The standalone `research` stage also uses `adr`;
+the installer includes it when selecting these skills.
 
 `blast-radius` and `design-review` use `bro` to explain findings in plain language.
 The installer includes `bro` when selecting these skills.
