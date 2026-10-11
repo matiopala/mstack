@@ -17,6 +17,7 @@ with Codex, Pi, and Claude Code.
 | [`adr`](skills/adr/SKILL.md) | Keep track of important decisions, their reasoning, and later changes. |
 | [`blast-radius`](skills/blast-radius/SKILL.md) | Check what a change could break elsewhere, with concrete evidence and a plain-language explanation. |
 | [`bro`](skills/bro/SKILL.md) | Get a simpler version of the previous answer. |
+| [`code-review`](skills/code-review/SKILL.md) | Review a PR for proof it works, regression risks, and simple, maintainable code. |
 | [`conventional-commits`](skills/conventional-commits/SKILL.md) | Prepare focused Git commits with clear Conventional Commit messages. |
 | [`decompose`](skills/decompose/SKILL.md) | Split a bigger design into reviewable tasks with clear acceptance criteria and proof of completion. |
 | [`deliver`](skills/deliver/SKILL.md) | Work through questions, research, planning, and implementation, then collect irrefutable proof of delivery. |
@@ -34,6 +35,9 @@ I can also use each stage on its own. `implement` includes verification,
 and the stages reuse the same task record when there is one. `deliver` also
 uses `design-review` and `blast-radius` when the change warrants them.
 
+`code-review` checks implemented changes with one reviewer. It accepts
+reproducible manual evidence and does not require rerunning supplied proof.
+
 ## Credits
 
 - `blast-radius` is adapted from
@@ -45,7 +49,7 @@ uses `design-review` and `blast-radius` when the change warrants them.
   [HumanLayer's research-plan-implement workflow](https://github.com/humanlayer/humanlayer/tree/main/.claude/commands).
   The interview stage uses `grill-me`. Flow tracing, debugging, and verification
   also borrow from [pstack](https://github.com/cursor/plugins/tree/main/pstack).
-- `design-review` adapts the review approach from
+- `code-review` and `design-review` adapt the review approach from
   [pstack's interrogate](https://github.com/cursor/plugins/blob/main/pstack/skills/interrogate/SKILL.md).
 
 ## Install
@@ -84,8 +88,8 @@ These stages, along with `product-spec`, `tech-spec`, and `decompose`, use `adr`
 to record important decisions, so the installer includes it too. For `grill-me`,
 decision capture only applies to software interviews in a repository.
 
-`blast-radius` and `design-review` use `bro` to explain findings in plain language.
-The installer includes `bro` when selecting these skills.
+`blast-radius`, `code-review`, and `design-review` use `bro` to explain their
+findings in plain language, so installing any of them also installs `bro`.
 If you copy skill folders manually, include their companions too.
 
 The installer refuses to replace existing files or links that point elsewhere.

@@ -65,7 +65,7 @@ for skill_name in $selected_skills; do
     product-spec|tech-spec|decompose|grill-me|research|plan|implement)
       companion_skills=adr
       ;;
-    blast-radius|design-review) companion_skills=bro ;;
+    blast-radius|code-review|design-review) companion_skills=bro ;;
     *) continue ;;
   esac
   for companion_skill in $companion_skills; do
