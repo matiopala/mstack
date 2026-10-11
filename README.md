@@ -67,7 +67,15 @@ By default, this creates symbolic links for every skill in:
 - `~/.claude/skills` for Claude Code
 
 The links point to this clone, so edits and pulls update the installed skill
-files too.
+files too. To update an existing installation:
+
+```sh
+git pull --ff-only
+./scripts/install
+```
+
+Run these commands from this clone. Pulling updates skills already linked here;
+rerunning the installer adds new skills and skips existing matching links.
 
 To install for just one tool:
 
@@ -95,7 +103,12 @@ when needed.
 findings in plain language, so installing any of them also installs `bro`.
 If you copy skill folders manually, include their companions too.
 
-The installer refuses to replace existing files or links that point elsewhere.
+The installer checks all selected skills and destinations before creating links.
+If this initial check finds a conflict, it reports the conflicts and leaves the
+installation unchanged. It refuses to replace existing files or links that point
+elsewhere. For a copied skill directory or a link to another clone, move the old entry
+outside the skills directory before reinstalling. Preserve any local edits you
+want to keep.
 Set `AGENTS_SKILLS_DIR` or `CLAUDE_SKILLS_DIR` to override either installation
 directory.
 
@@ -114,13 +127,23 @@ Each skill lives in `skills/<skill-name>/SKILL.md`. Any supporting scripts,
 references, or assets stay in the same folder. I keep the shared instructions
 compatible with all three tools wherever possible.
 
+Set up the validation dependencies once:
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements-dev.txt
+```
+
 After editing, run:
 
 ```sh
-./scripts/validate
+.venv/bin/python scripts/validate
+.venv/bin/python -m unittest discover -s tests -v
 ```
 
-This checks skill names and required metadata.
+The validator parses YAML frontmatter and checks skill names and required
+metadata. The tests cover validation and installation behavior in temporary
+directories.
 
 ## License
 

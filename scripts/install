@@ -76,18 +76,15 @@ for skill_name in $selected_skills; do
   done
 done
 
-link_skill() {
+check_target() {
   source_path=$1
   target_root=$2
   skill_name=$(basename "$source_path")
   target_path="$target_root/$skill_name"
 
-  mkdir -p "$target_root"
-
   if [ -L "$target_path" ]; then
     existing_target=$(readlink "$target_path")
     if [ "$existing_target" = "$source_path" ]; then
-      printf 'Already linked: %s\n' "$target_path"
       return
     fi
     printf 'Refusing to replace link: %s -> %s\n' "$target_path" "$existing_target" >&2
@@ -99,16 +96,64 @@ link_skill() {
     return 1
   fi
 
+  target_ancestor=$target_root
+  while [ ! -e "$target_ancestor" ] && [ ! -L "$target_ancestor" ]; do
+    target_ancestor=$(dirname "$target_ancestor")
+  done
+  if [ ! -d "$target_ancestor" ]; then
+    printf 'Cannot create installation directory: %s is not a directory\n' "$target_ancestor" >&2
+    return 1
+  fi
+  if [ ! -w "$target_ancestor" ] || [ ! -x "$target_ancestor" ]; then
+    printf 'Cannot write to installation directory: %s\n' "$target_ancestor" >&2
+    return 1
+  fi
+}
+
+link_skill() {
+  # Recheck the destination in case it changed after preflight.
+  check_target "$1" "$2"
+  if [ -L "$target_path" ]; then
+    printf 'Already linked: %s\n' "$target_path"
+    return
+  fi
+
+  mkdir -p "$target_root"
   ln -s "$source_path" "$target_path"
   printf 'Linked: %s -> %s\n' "$target_path" "$source_path"
 }
 
+# Check every source and destination before creating any directories or links.
+preflight_failed=0
 for skill_name in $selected_skills; do
   source_path="$skills_dir/$skill_name"
   if [ ! -f "$source_path/SKILL.md" ]; then
     printf 'Unknown or invalid skill: %s\n' "$skill_name" >&2
-    exit 1
+    preflight_failed=1
+    continue
   fi
+
+  case "$harness" in
+    all)
+      check_target "$source_path" "$agents_skills_dir" || preflight_failed=1
+      check_target "$source_path" "$claude_skills_dir" || preflight_failed=1
+      ;;
+    codex|pi)
+      check_target "$source_path" "$agents_skills_dir" || preflight_failed=1
+      ;;
+    claude)
+      check_target "$source_path" "$claude_skills_dir" || preflight_failed=1
+      ;;
+  esac
+done
+
+if [ "$preflight_failed" -ne 0 ]; then
+  printf 'Installation cancelled; no skills were linked.\n' >&2
+  exit 1
+fi
+
+for skill_name in $selected_skills; do
+  source_path="$skills_dir/$skill_name"
 
   case "$harness" in
     all)
