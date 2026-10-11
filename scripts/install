@@ -56,18 +56,21 @@ if [ -z "$selected_skills" ]; then
   done
 fi
 
-# These workflows share ADR handling. Include the companion when selecting
-# individual skills as well as when installing the whole repository.
+# Include the shared skills used by selected workflows.
 for skill_name in $selected_skills; do
   case "$skill_name" in
     product-spec|tech-spec|decompose|deliver|grill-me)
-      case " $selected_skills " in
-        *" adr "*) ;;
-        *) selected_skills="adr $selected_skills" ;;
-      esac
-      break
+      companion_skills=adr
       ;;
+    design-review) companion_skills=bro ;;
+    *) continue ;;
   esac
+  for companion_skill in $companion_skills; do
+    case " $selected_skills " in
+      *" $companion_skill "*) ;;
+      *) selected_skills="$companion_skill $selected_skills" ;;
+    esac
+  done
 done
 
 link_skill() {
