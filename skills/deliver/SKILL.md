@@ -35,8 +35,11 @@ context and follow the user's requested output format and project conventions.
 
 Use [grill-me](../grill-me/SKILL.md) to clarify the desired outcome, scope,
 constraints, concrete acceptance examples, and existing behavior that must
-remain working. Finish when these are sufficiently clear to guide research
-and planning.
+remain working. Ask only about consequential gaps not settled by available
+context. When these are sufficiently clear to guide research and planning,
+carry the interview summary into the next authorized stage without another
+approval question. If they are already clear, proceed without additional
+interview questions.
 
 ## 2. Research
 

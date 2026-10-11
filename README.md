@@ -43,7 +43,8 @@ reproducible manual evidence and does not require rerunning supplied proof.
 - `blast-radius` is adapted from
   [pstack's blast-radius](https://github.com/cursor/plugins/blob/main/pstack/skills/blast-radius/SKILL.md).
 - `bro` is adapted from [backnotprop/bro](https://github.com/backnotprop/bro).
-- `grill-me` is adapted from [Matt Pocock's skills](https://github.com/mattpocock/skills).
+- `grill-me` is adapted from
+  [Matt Pocock's original skill](https://github.com/mattpocock/skills/blob/a6bdfd9fed6c17d21b306aeb7ff6a0de8b72ef3c/grill-me/SKILL.md).
 - `show-me` is inspired by [HumanLayer's show-me](https://github.com/humanlayer/skills/tree/main/plugins/show-me).
 - `deliver` and its extracted `research`, `plan`, and `implement` stages draw on
   [HumanLayer's research-plan-implement workflow](https://github.com/humanlayer/humanlayer/tree/main/.claude/commands).
@@ -84,9 +85,11 @@ Or pick individual skills:
 
 Installing `deliver` includes `grill-me`, `research`, `plan`, and `implement`.
 It also includes `design-review`, `blast-radius`, and their `bro` companion.
-These stages, along with `product-spec`, `tech-spec`, and `decompose`, use `adr`
-to record important decisions, so the installer includes it too. For `grill-me`,
-decision capture only applies to software interviews in a repository.
+`research`, `plan`, and `implement`, along with `product-spec`, `tech-spec`,
+and `decompose`, use `adr` to record important decisions, so installing them
+or `deliver` includes it too. `grill-me` records ADRs only when explicitly
+requested and does not install `adr` automatically; install it separately
+when needed.
 
 `blast-radius`, `code-review`, and `design-review` use `bro` to explain their
 findings in plain language, so installing any of them also installs `bro`.
