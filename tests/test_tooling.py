@@ -122,6 +122,22 @@ class InstallerTests(unittest.TestCase):
         )
         self.assertFalse(self.claude.exists())
 
+    def test_project_plan_installs_adr_only_in_selected_harness(self):
+        for harness in ("codex", "pi", "claude"):
+            with self.subTest(harness=harness):
+                self.agents = self.root / harness / "agents"
+                self.claude = self.root / harness / "claude"
+
+                result = self.install("--harness", harness, "project-plan")
+
+                self.assertEqual(result.returncode, 0, result.stderr)
+                if harness == "claude":
+                    installed, unused = self.claude, self.agents
+                else:
+                    installed, unused = self.agents, self.claude
+                self.assert_links(installed, {"project-plan", "adr"})
+                self.assertFalse(unused.exists())
+
     def test_standalone_interview_has_no_automatic_adr_dependency(self):
         result = self.install("--harness", "claude", "grill-me")
 

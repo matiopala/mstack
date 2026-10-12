@@ -26,6 +26,7 @@ with Codex, Pi, and Claude Code.
 | [`implement`](skills/implement/SKILL.md) | Implement a defined change and prove it meets acceptance and regression checks. |
 | [`plan`](skills/plan/SKILL.md) | Define the approach, acceptance checks, and irrefutable proof for a software change. |
 | [`product-spec`](skills/product-spec/SKILL.md) | Define the user problem, desired outcome, and what success looks like. |
+| [`project-plan`](skills/project-plan/SKILL.md) | Shape an initial project plan with scope, milestones, dependencies, and the specs needed next. |
 | [`research`](skills/research/SKILL.md) | Investigate specific software questions and identify constraints, regression risks, and verification options. |
 | [`show-me`](skills/show-me/SKILL.md) | Get a focused visual explanation. |
 | [`tech-spec`](skills/tech-spec/SKILL.md) | Describe how a feature should work technically and how to prove it works. |
@@ -34,6 +35,13 @@ with Codex, Pi, and Claude Code.
 I can also use each stage on its own. `implement` includes verification,
 and the stages reuse the same task record when there is one. `deliver` also
 uses `design-review` and `blast-radius` when the change warrants them.
+
+`project-plan` defines the overall project and its milestones before detailed
+design. It covers initial planning, asks me for estimates and deadlines, and
+never proposes its own. A larger project can move from `project-plan` through
+`product-spec` and `tech-spec` where needed, then `decompose` and `deliver`.
+Smaller changes can start with the relevant stage. `plan` defines the
+implementation approach for a particular change.
 
 `code-review` checks implemented changes with one reviewer. It accepts
 reproducible manual evidence and does not require rerunning supplied proof.
@@ -93,9 +101,9 @@ Or pick individual skills:
 
 Installing `deliver` includes `grill-me`, `research`, `plan`, and `implement`.
 It also includes `design-review`, `blast-radius`, and their `bro` companion.
-`research`, `plan`, and `implement`, along with `product-spec`, `tech-spec`,
-and `decompose`, use `adr` to record important decisions, so installing them
-or `deliver` includes it too. `grill-me` records ADRs only when explicitly
+`research`, `plan`, and `implement`, along with `project-plan`, `product-spec`,
+`tech-spec`, and `decompose`, use `adr` to record important decisions, so installing
+them or `deliver` includes it too. `grill-me` records ADRs only when explicitly
 requested and does not install `adr` automatically; install it separately
 when needed.
 

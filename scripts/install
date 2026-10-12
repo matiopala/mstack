@@ -62,7 +62,7 @@ for skill_name in $selected_skills; do
     deliver)
       companion_skills="adr bro grill-me research plan implement design-review blast-radius"
       ;;
-    product-spec|tech-spec|decompose|research|plan|implement)
+    project-plan|product-spec|tech-spec|decompose|research|plan|implement)
       companion_skills=adr
       ;;
     blast-radius|code-review|design-review) companion_skills=bro ;;
