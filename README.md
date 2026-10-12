@@ -23,6 +23,7 @@ with Codex, Pi, and Claude Code.
 | [`deliver`](skills/deliver/SKILL.md) | Work through questions, research, planning, and implementation, then collect irrefutable proof of delivery. |
 | [`design-review`](skills/design-review/SKILL.md) | Challenge a proposed solution and get concrete findings in plain language. |
 | [`grill-me`](skills/grill-me/SKILL.md) | Get interviewed about an idea, surface assumptions, and clarify what I actually want. |
+| [`handoff`](skills/handoff/SKILL.md) | Pass the current work to a fresh agent with artifact references, verification status, and an exact next action. |
 | [`implement`](skills/implement/SKILL.md) | Implement a defined change and prove it meets acceptance and regression checks. |
 | [`plan`](skills/plan/SKILL.md) | Define the approach, acceptance checks, and irrefutable proof for a software change. |
 | [`product-spec`](skills/product-spec/SKILL.md) | Define the user problem, desired outcome, and what success looks like. |
@@ -53,6 +54,9 @@ reproducible manual evidence and does not require rerunning supplied proof.
 - `bro` is adapted from [backnotprop/bro](https://github.com/backnotprop/bro).
 - `grill-me` is adapted from
   [Matt Pocock's original skill](https://github.com/mattpocock/skills/blob/a6bdfd9fed6c17d21b306aeb7ff6a0de8b72ef3c/grill-me/SKILL.md).
+- `handoff` is adapted from
+  [Matt Pocock's handoff](https://github.com/mattpocock/skills/blob/0f5e033ebc47b142f5ffa56a582ede6d9d9bada3/skills/productivity/handoff/SKILL.md),
+  with its [MIT license](skills/handoff/LICENSE) preserved.
 - `show-me` is inspired by [HumanLayer's show-me](https://github.com/humanlayer/skills/tree/main/plugins/show-me).
 - `deliver` and its extracted `research`, `plan`, and `implement` stages draw on
   [HumanLayer's research-plan-implement workflow](https://github.com/humanlayer/humanlayer/tree/main/.claude/commands).
@@ -155,4 +159,5 @@ directories.
 
 ## License
 
-Licensed under the [Apache License 2.0](LICENSE).
+Licensed under the [Apache License 2.0](LICENSE), except for `handoff`,
+which retains its [MIT license](skills/handoff/LICENSE).
