@@ -64,6 +64,9 @@ reproducible manual evidence and does not require rerunning supplied proof.
   also borrow from [pstack](https://github.com/cursor/plugins/tree/main/pstack).
 - `code-review` and `design-review` adapt the review approach from
   [pstack's interrogate](https://github.com/cursor/plugins/blob/main/pstack/skills/interrogate/SKILL.md).
+  `code-review` also draws on
+  [Armin Ronacher's Pi review extension](https://github.com/mitsuhiko/agent-stuff/blob/main/extensions/review.ts)
+  for finding criteria, hidden-failure checks, and informational human notices.
 
 ## Install
 

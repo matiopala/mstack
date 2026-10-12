@@ -5,6 +5,9 @@ description: Review a PR, diff, or implemented change for irrefutable proof, reg
 
 <!-- Inspired by pstack's interrogate, adapted for a focused single-reviewer workflow:
 https://github.com/cursor/plugins/blob/main/pstack/skills/interrogate/SKILL.md
+Finding criteria, hidden-failure checks, and human notices are also inspired by
+Armin Ronacher's Pi review extension:
+https://github.com/mitsuhiko/agent-stuff/blob/main/extensions/review.ts
 The code rubric follows this repo's implement principles.
 -->
 
@@ -50,6 +53,13 @@ and failure or lifecycle paths. Check whether the regression evidence protects
 the existing behavior at risk. Favor meaningful integration and end-to-end
 checks; use unit tests where helpful, without a coverage-percentage gate.
 
+Keep code findings discrete and actionable: each must identify a problem
+introduced or worsened by the change, with a concrete scenario and demonstrable
+impact. Identify affected callers or contracts before claiming downstream
+breakage. Use requirements and accepted decisions to distinguish intentional
+behavior from defects. Match review rigor to the project's conventions and
+risk without weakening required acceptance proof.
+
 Judge the code against these principles:
 
 - Make the smallest correct change within scope and existing conventions.
@@ -61,6 +71,12 @@ Judge the code against these principles:
   boundaries, and use types or structures that make invalid states hard to represent.
 - Handle meaningful failures deliberately; make retryable operations
   idempotent where practical.
+
+Inspect changed catch blocks and fallback paths for failures disguised as
+success or empty results. Recovery is valid when it preserves the intended
+contract and required failure signals. If the current layer cannot recover
+correctly, recommend propagating the error or handling it explicitly at an
+appropriate boundary.
 
 Flag maintenance costs introduced or worsened by the change only when you can
 explain a concrete consequence and a simpler, scoped alternative. Material
@@ -82,6 +98,11 @@ Keep the report concise:
 3. **Findings:** prioritize by consequence. Give each material finding a code
    or evidence reference, a concrete scenario and impact, and the smallest
    useful remedy or check needed to resolve it.
+4. **Human notices:** identify migrations, dependency changes, auth or permission
+   changes, breaking contracts, and destructive or irreversible operations when
+   present. Give locations and practical implications. These notices alone do
+   not affect the verdict or create fix tasks; a defect needs its own finding.
+   Omit this section when none apply.
 
 Separate confirmed problems, unresolved risks, and optional improvements.
 Do not invent findings to fill a review. If no material issue is found, state
