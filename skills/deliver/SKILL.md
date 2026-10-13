@@ -1,6 +1,6 @@
 ---
 name: deliver
-description: Guide a software change through requirements interviewing, focused research, planning, implementation, and acceptance verification. Use when the user requests this development workflow.
+description: Guide a software change through requirements interviewing, focused research, planning, implementation, verification, and review and fixes. Use when the user requests this development workflow.
 ---
 
 <!-- Inspired by Matt Pocock's grill-me and HumanLayer's research-plan-implement workflow:
@@ -58,7 +58,7 @@ solution introduces consequential design choices, such as new ownership
 boundaries or shared contracts. Reuse an existing review when its assumptions
 still hold, and address material findings within the authorized scope.
 
-## 4. Implement and prove delivery
+## 4. Implement, verify, and review
 
 For changes to shared contracts, persisted data, lifecycle behavior, or other
 concrete downstream risks, use [blast-radius](../blast-radius/SKILL.md) to
@@ -67,6 +67,7 @@ the plan and check them against the final code. Keep review effort proportional
 to the change.
 
 Use [implement](../implement/SKILL.md) to make the scoped change, verify it
-against the agreed criteria, and report the evidence. Implementation includes
-acceptance and regression verification; stop short of claiming delivery when
-required evidence is missing.
+against the agreed criteria, and complete its review-and-fix loop. Let that
+skill own the loop; do not add a second delivery review. Report the final
+evidence and review outcome. Missing required evidence or unresolved material
+review findings prevent a completion claim.

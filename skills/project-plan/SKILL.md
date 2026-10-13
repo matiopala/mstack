@@ -7,9 +7,9 @@ Turn a project idea and available context into a bounded initial plan ready
 for the necessary product and technical specifications. Plan the whole
 intended project, with firmer detail for the first milestone.
 
-Use the [adr](../adr/SKILL.md) skill to consult relevant accepted decisions
-and capture consequential project scope or sequencing choices as they emerge.
-Link the records from the plan.
+Consult relevant accepted decision records. Load [adr](../adr/SKILL.md) only
+when a consequential scope or sequencing choice warrants creating or revising
+a record. Link the records from the plan.
 
 ## Establish the project
 

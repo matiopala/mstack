@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Review a PR, diff, or implemented change for irrefutable proof, regression protection, and code quality. Use when the user asks for code review or a judgment of whether a change is ready.
+description: Review a PR, diff, or implemented change for irrefutable proof, regression protection, and code quality. Use when the user requests review or an implementation workflow calls for it.
 ---
 
 <!-- Inspired by pstack's interrogate, adapted for a focused single-reviewer workflow:
@@ -11,10 +11,15 @@ https://github.com/mitsuhiko/agent-stuff/blob/main/extensions/review.ts
 The code rubric follows this repo's implement principles.
 -->
 
-Use one reviewer; delegate only when the user requests it. Reuse established
-context and widen investigation only for concrete questions or risks.
+Use one reviewer. Delegate when the user or calling workflow authorizes it
+and the host permits it. A delegated reviewer performs the review itself
+without spawning another reviewer. Reuse established context and widen
+investigation only for concrete questions or risks.
 Report findings without changing product code or building missing tests or
 verification tools unless the user also requests that work.
+When reviewing within an implementation workflow, return findings to the
+implementing agent, which owns fixes. Identify a review performed by the
+implementing agent in its current session as self-review.
 
 ## Ground the review
 
@@ -86,8 +91,8 @@ preferences optional and unrelated cleanup outside the review.
 
 ## Report the result
 
-Apply [bro](../bro/SKILL.md) to explain the review in plain language while
-preserving priorities, references, uncertainty, and reproduction instructions.
+Explain the review in plain language, preserving priorities, references,
+uncertainty, and reproduction instructions.
 
 Keep the report concise:
 

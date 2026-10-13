@@ -56,16 +56,18 @@ if [ -z "$selected_skills" ]; then
   done
 fi
 
-# Include the shared skills used by selected workflows.
+# Include each workflow's complete companion set, including indirect dependencies.
 for skill_name in $selected_skills; do
   case "$skill_name" in
     deliver)
-      companion_skills="adr bro grill-me research plan implement design-review blast-radius"
+      companion_skills="adr grill-me research plan implement design-review blast-radius code-review"
       ;;
-    project-plan|product-spec|tech-spec|decompose|research|plan|implement)
+    implement)
+      companion_skills="adr code-review"
+      ;;
+    project-plan|product-spec|tech-spec|decompose|research|plan)
       companion_skills=adr
       ;;
-    blast-radius|code-review|design-review) companion_skills=bro ;;
     *) continue ;;
   esac
   for companion_skill in $companion_skills; do

@@ -17,8 +17,8 @@ Inspect affected code and tests to resolve specific gaps. Ask one consequential
 question at a time when available evidence cannot settle a requirement or
 tradeoff. Prior interview or research artifacts are helpful, not prerequisites.
 
-Use the [adr](../adr/SKILL.md) skill to consult relevant accepted decisions
-and capture consequential planning choices as they emerge.
+Consult relevant accepted decision records. Load [adr](../adr/SKILL.md) only
+when a consequential planning choice warrants creating or revising a record.
 
 ## Define the approach and proof
 

@@ -20,22 +20,37 @@ with Codex, Pi, and Claude Code.
 | [`code-review`](skills/code-review/SKILL.md) | Review a PR for proof it works, regression risks, and simple, maintainable code. |
 | [`conventional-commits`](skills/conventional-commits/SKILL.md) | Prepare focused Git commits with clear Conventional Commit messages. |
 | [`decompose`](skills/decompose/SKILL.md) | Split a bigger design into reviewable tasks with clear acceptance criteria and proof of completion. |
-| [`deliver`](skills/deliver/SKILL.md) | Work through questions, research, planning, and implementation, then collect irrefutable proof of delivery. |
+| [`deliver`](skills/deliver/SKILL.md) | Work through questions, research, planning, implementation, verification, and review and fixes. |
 | [`design-review`](skills/design-review/SKILL.md) | Challenge a proposed solution and get concrete findings in plain language. |
 | [`grill-me`](skills/grill-me/SKILL.md) | Get interviewed about an idea, surface assumptions, and clarify what I actually want. |
 | [`handoff`](skills/handoff/SKILL.md) | Pass the current work to a fresh agent with artifact references, verification status, and an exact next action. |
-| [`implement`](skills/implement/SKILL.md) | Implement a defined change and prove it meets acceptance and regression checks. |
+| [`implement`](skills/implement/SKILL.md) | Implement a defined change, verify it, and review and fix material issues before delivery. |
 | [`plan`](skills/plan/SKILL.md) | Define the approach, acceptance checks, and irrefutable proof for a software change. |
 | [`product-spec`](skills/product-spec/SKILL.md) | Define the user problem, desired outcome, and what success looks like. |
 | [`project-plan`](skills/project-plan/SKILL.md) | Shape an initial project plan with scope, milestones, dependencies, and the specs needed next. |
+| [`prototype`](skills/prototype/SKILL.md) | Reach a concrete goal through a lightweight working prototype and checks suited to that goal. |
 | [`research`](skills/research/SKILL.md) | Investigate specific software questions and identify constraints, regression risks, and verification options. |
+| [`session-review`](skills/session-review/SKILL.md) | Learn from selected coding sessions and identify evidence-backed workflow improvements. |
 | [`show-me`](skills/show-me/SKILL.md) | Get a focused visual explanation. |
 | [`tech-spec`](skills/tech-spec/SKILL.md) | Describe how a feature should work technically and how to prove it works. |
 
-`deliver` ties together `grill-me`, `research`, `plan`, and `implement`.
-I can also use each stage on its own. `implement` includes verification,
-and the stages reuse the same task record when there is one. `deliver` also
-uses `design-review` and `blast-radius` when the change warrants them.
+Use `prototype` to try an idea or answer a question through working code.
+It iterates toward the goal and checks that outcome, without a mandatory
+code-review loop or general production hardening. A latency or quality goal
+still needs appropriate measurements or checks.
+
+Use `implement` for a defined change. It owns implementation, verification,
+code review, and fixes until the final evidence supports completion and no
+material review findings remain. It prefers one reviewer subagent when available
+and permitted; otherwise it performs and identifies self-review. After fixes,
+it reruns affected checks and reviews their consequences. Optional polish does
+not keep the loop running.
+
+`deliver` ties together `grill-me`, `research`, `plan`, and `implement` when the
+full workflow is wanted. It inherits the implementation review loop rather than
+adding another. I can also use each stage on its own, and the stages reuse the
+same task record when there is one. `deliver` uses `design-review` and
+`blast-radius` when the change warrants them.
 
 `project-plan` defines the overall project and its milestones before detailed
 design. It covers initial planning, asks me for estimates and deadlines, and
@@ -46,6 +61,13 @@ implementation approach for a particular change.
 
 `code-review` checks implemented changes with one reviewer. It accepts
 reproducible manual evidence and does not require rerunning supplied proof.
+In the implementation loop, the reviewer reports findings and the implementing
+agent owns fixes. A standalone review leaves code unchanged unless fixes are
+also requested.
+
+Use `session-review` when reviewing selected past sessions, not after every
+task. It uses transcript and artifact evidence to recommend narrow improvements;
+it does not automatically edit skills or project guidance.
 
 ## Credits
 
@@ -107,16 +129,20 @@ Or pick individual skills:
 ```
 
 Installing `deliver` includes `grill-me`, `research`, `plan`, and `implement`.
-It also includes `design-review`, `blast-radius`, and their `bro` companion.
+It also includes `design-review`, `blast-radius`, and `code-review`.
+Installing `implement` includes `code-review`.
 `research`, `plan`, and `implement`, along with `project-plan`, `product-spec`,
-`tech-spec`, and `decompose`, use `adr` to record important decisions, so installing
-them or `deliver` includes it too. `grill-me` records ADRs only when explicitly
-requested and does not install `adr` automatically; install it separately
-when needed.
+`tech-spec`, and `decompose`, consult relevant existing decision records and load
+`adr` only when a consequential choice warrants creating or revising one.
+Installing those workflows or `deliver` includes `adr` so it is available when
+needed. `grill-me` records ADRs only when explicitly requested and does not
+install `adr` automatically; install it separately when needed.
 
-`blast-radius`, `code-review`, and `design-review` use `bro` to explain their
-findings in plain language, so installing any of them also installs `bro`.
-If you copy skill folders manually, include their companions too.
+`prototype`, `session-review`, `blast-radius`, `code-review`, and `design-review`
+have no companion dependencies. Reviews explain their findings directly in
+plain language; `bro` remains available for standalone simplification requests.
+If you copy workflow folders manually, include their companions too. Rerunning
+the installer does not remove previously installed skills.
 
 The installer checks all selected skills and destinations before creating links.
 If this initial check finds a conflict, it reports the conflicts and leaves the
@@ -159,6 +185,11 @@ After editing, run:
 The validator parses YAML frontmatter and checks skill names and required
 metadata. The tests cover validation and installation behavior in temporary
 directories.
+
+[Behavioral evaluations](evals/README.md) exercise the workflows in isolated
+agent sessions. They assess outcomes and tool traces, not exact response wording.
+Run relevant cases when changing workflow behavior and record live-agent results
+separately from deterministic tooling CI.
 
 ## License
 

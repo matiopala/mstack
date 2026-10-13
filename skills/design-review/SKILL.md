@@ -62,12 +62,8 @@ implementation only when included in the user's requested scope.
 
 ## Explain the review
 
-By default, read and apply [bro](../bro/SKILL.md) to the review draft before
-presenting findings.
-Preserve the verdict, priorities, supporting references, uncertainty, and
-recommended actions while simplifying the language.
+Explain the review in plain language, preserving the verdict, priorities,
+supporting references, uncertainty, and recommended actions.
 
 Lead with whether the design is ready for its intended next step and why.
 Follow with the important findings and the decisions or evidence needed.
-Return the plain-language review directly, without a separate technical
-version or commentary about rewriting it.

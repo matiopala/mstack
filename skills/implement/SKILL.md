@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Implement a defined software change or established plan and prove delivery through acceptance and regression checks. Use when the user wants implementation without repeating the full interview, research, and planning workflow.
+description: Implement a defined software change, verify it, and review and fix material issues before delivery. Use when the user wants implementation without repeating the full interview, research, and planning workflow.
 ---
 
 <!-- Extracted from deliver; workflow inspired by HumanLayer:
@@ -23,9 +23,9 @@ plan, progress, consequential revisions, and verification evidence in that
 same authoritative record. A task record is optional; otherwise, follow the
 user's requested output format and project conventions.
 
-Use the [adr](../adr/SKILL.md) skill to consult relevant accepted decisions
-before changing code. Capture consequential choices and deviations as they
-emerge, and link the records from the plan or task record.
+Consult relevant accepted decision records before changing code. Load
+[adr](../adr/SKILL.md) only when a consequential choice or deviation warrants
+creating or revising a record; link it from the plan or task record.
 
 ## Implement
 
@@ -84,8 +84,33 @@ Distinguish verified behavior from assumptions and unverified checks.
 If required evidence is unavailable, report the gap and leave the affected
 criterion incomplete.
 
-When using a task record, mark it complete only when the required evidence
-supports all acceptance criteria.
+## Review and fix
+
+After implementation and initial verification, use
+[code-review](../code-review/SKILL.md) to review the actual changes. Provide the
+requirements, comparison base and change scope, relevant decisions, and
+verification evidence. Include uncommitted and new files within that scope.
+
+Prefer one reviewer subagent with fresh context when available and permitted.
+Give it the necessary artifacts rather than the full implementation conversation.
+Otherwise, review in the current session and identify the result as self-review.
+The reviewer reports findings; the implementing agent owns fixes.
+
+Check findings against the code and requirements. Fix confirmed, material
+issues within scope without asking for renewed approval. Explain findings
+rejected with evidence; optional polish does not prolong the loop.
+
+After fixes, rerun affected checks, refresh the evidence, and review the fixes
+and their consequences. Widen review only when changes or new evidence warrant
+it. Repeat while material issues remain. One clean review ends the loop when
+the required acceptance and regression evidence supports the final code.
+
+If the loop stops making progress, revisit the diagnosis. Report any concrete
+blocker, missing evidence, or decision requiring the user; do not repeat
+ineffective rounds or turn an iteration limit into a ready verdict.
+
+When using a task record, mark it complete only when all acceptance criteria
+are supported and no material review findings remain unresolved.
 
 Finish with the delivered outcome, acceptance evidence, regression
-results, and any remaining limitations.
+results, review outcome, and any remaining limitations.

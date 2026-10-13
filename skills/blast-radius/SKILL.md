@@ -38,8 +38,8 @@ user also asked for implementation.
 
 ## Explain the result
 
-By default, read and apply [bro](../bro/SKILL.md) to the review draft.
-Preserve priorities, evidence, uncertainty, and recommended actions.
+Explain the findings in plain language, preserving priorities, evidence,
+uncertainty, and recommended actions.
 
 Lead with the most important consequence, then cover:
 

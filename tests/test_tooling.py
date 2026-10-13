@@ -42,17 +42,21 @@ class InstallerTests(unittest.TestCase):
             self.assertEqual(link.resolve(), ROOT / "skills" / name)
 
     def test_copied_dependency_blocks_all_writes(self):
-        copied = self.agents / "grill-me"
-        copied.mkdir(parents=True)
-        (copied / "SKILL.md").write_text("Existing user copy\n")
+        for skill, dependency in (("deliver", "grill-me"), ("implement", "code-review")):
+            with self.subTest(skill=skill):
+                self.agents = self.root / skill / "agents"
+                self.claude = self.root / skill / "claude"
+                copied = self.agents / dependency
+                copied.mkdir(parents=True)
+                (copied / "SKILL.md").write_text("Existing user copy\n")
 
-        result = self.install("deliver")
+                result = self.install(skill)
 
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("Refusing to replace existing path", result.stderr)
-        self.assertEqual(list(self.agents.iterdir()), [copied])
-        self.assertEqual((copied / "SKILL.md").read_text(), "Existing user copy\n")
-        self.assertFalse(self.claude.exists())
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("Refusing to replace existing path", result.stderr)
+                self.assertEqual(list(self.agents.iterdir()), [copied])
+                self.assertEqual((copied / "SKILL.md").read_text(), "Existing user copy\n")
+                self.assertFalse(self.claude.exists())
 
     def test_conflict_in_second_harness_blocks_first_harness(self):
         self.claude.mkdir()
@@ -111,16 +115,45 @@ class InstallerTests(unittest.TestCase):
             self.assert_links(self.agents, expected)
             self.assert_links(self.claude, expected)
 
-    def test_delivery_dependencies_are_installed_for_selected_harness(self):
-        result = self.install("--harness", "codex", "deliver")
+    def test_workflow_dependencies_are_installed_for_selected_harness(self):
+        workflows = {
+            "deliver": {"deliver", "grill-me", "research", "plan", "implement",
+                        "design-review", "blast-radius", "code-review", "adr"},
+            "implement": {"implement", "code-review", "adr"},
+        }
+        for skill, expected in workflows.items():
+            for harness in ("codex", "pi", "claude"):
+                with self.subTest(skill=skill, harness=harness):
+                    self.agents = self.root / skill / harness / "agents"
+                    self.claude = self.root / skill / harness / "claude"
 
-        self.assertEqual(result.returncode, 0, result.stderr)
-        self.assert_links(
-            self.agents,
-            {"deliver", "grill-me", "research", "plan", "implement", "design-review",
-             "blast-radius", "bro", "adr"},
-        )
-        self.assertFalse(self.claude.exists())
+                    result = self.install("--harness", harness, skill)
+
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    if harness == "claude":
+                        installed, unused = self.claude, self.agents
+                    else:
+                        installed, unused = self.agents, self.claude
+                    self.assert_links(installed, expected)
+                    self.assertFalse(unused.exists())
+
+    def test_independent_skills_install_without_companions(self):
+        for skill in ("prototype", "session-review", "code-review", "design-review",
+                      "blast-radius", "bro"):
+            for harness in ("codex", "pi", "claude"):
+                with self.subTest(skill=skill, harness=harness):
+                    self.agents = self.root / skill / harness / "agents"
+                    self.claude = self.root / skill / harness / "claude"
+
+                    result = self.install("--harness", harness, skill)
+
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    if harness == "claude":
+                        installed, unused = self.claude, self.agents
+                    else:
+                        installed, unused = self.agents, self.claude
+                    self.assert_links(installed, {skill})
+                    self.assertFalse(unused.exists())
 
     def test_project_plan_installs_adr_only_in_selected_harness(self):
         for harness in ("codex", "pi", "claude"):

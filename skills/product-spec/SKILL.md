@@ -6,9 +6,9 @@ description: Define the user problem, intended outcomes, required behavior, and 
 Create a product specification anchored in user outcomes. Every requirement
 must advance an agreed outcome or protect a necessary constraint.
 
-Use the [adr](../adr/SKILL.md) skill to consult relevant accepted decisions
-and capture consequential product choices as they emerge. Link the records
-from the specification.
+Consult relevant accepted decision records. Load [adr](../adr/SKILL.md) only
+when a consequential product choice warrants creating or revising a record.
+Link the records from the specification.
 
 ## Discover
 

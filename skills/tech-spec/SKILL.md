@@ -10,8 +10,9 @@ how successful implementation will be demonstrated.
 Use existing requirements, architectural decisions, and conversation context.
 A formal product specification is helpful but not required.
 
-Use the [adr](../adr/SKILL.md) skill to consult relevant accepted decisions
-before design and capture consequential choices as they emerge.
+Consult relevant accepted decision records before design. Load
+[adr](../adr/SKILL.md) only when a consequential design choice warrants
+creating or revising a record.
 
 ## 1. Establish the requirements
 

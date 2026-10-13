@@ -18,8 +18,8 @@ Reuse findings from earlier discussion and investigation.
 Ask one consequential question at a time when needed to focus the research.
 Investigate available context before asking for facts inspection could establish.
 
-Use the [adr](../adr/SKILL.md) skill to consult relevant accepted decisions
-and capture consequential choices that emerge during clarification.
+Consult relevant accepted decision records. Load [adr](../adr/SKILL.md) only
+when a consequential choice warrants creating or revising a record.
 
 ## Investigate
 
