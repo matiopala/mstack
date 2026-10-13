@@ -34,6 +34,10 @@ For every goal, define:
   commands when known, and the observable results they must establish.
 - The irrefutable proof to collect before claiming delivery.
 
+Reuse relevant journeys from an existing project verification skill when
+choosing checks, noting any recipe gaps. Creating a skill or auditing its whole
+map is separate work, not a prerequisite for planning this change.
+
 Define irrefutable proof as reproducible, inspectable evidence that the
 acceptance criteria hold under the stated test conditions.
 

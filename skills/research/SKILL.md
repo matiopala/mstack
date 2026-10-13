@@ -26,6 +26,10 @@ when a consequential choice warrants creating or revising a record.
 Trace affected behavior, dependencies, boundaries, existing patterns, and
 tests around specific questions. Verify assumptions against current code.
 
+Consult an existing project verification skill and relevant feature recipes
+before rediscovering setup and harnesses. Treat them as leads, not proof of
+current behavior. Their absence does not require creating one during research.
+
 For behavior questions, follow a concrete example from its entry point through
 validation, component boundaries, and state ownership to the observable result.
 Include relevant failure paths and source references. Scale the trace to the

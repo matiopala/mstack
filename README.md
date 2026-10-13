@@ -19,12 +19,14 @@ with Codex, Pi, and Claude Code.
 | [`bro`](skills/bro/SKILL.md) | Get a simpler version of the previous answer. |
 | [`code-review`](skills/code-review/SKILL.md) | Review a PR for proof it works, regression risks, and simple, maintainable code. |
 | [`conventional-commits`](skills/conventional-commits/SKILL.md) | Prepare focused Git commits with clear Conventional Commit messages. |
+| [`create-verification-skill`](skills/create-verification-skill/SKILL.md) | Create reusable, project-local instructions for driving the real app and collecting proof. |
 | [`decompose`](skills/decompose/SKILL.md) | Split a bigger design into reviewable tasks with clear acceptance criteria and proof of completion. |
 | [`deliver`](skills/deliver/SKILL.md) | Work through questions, research, planning, implementation, verification, and review and fixes. |
 | [`design-review`](skills/design-review/SKILL.md) | Challenge a proposed solution and get concrete findings in plain language. |
 | [`grill-me`](skills/grill-me/SKILL.md) | Get interviewed about an idea, surface assumptions, and clarify what I actually want. |
 | [`handoff`](skills/handoff/SKILL.md) | Pass the current work to a fresh agent with artifact references, verification status, and an exact next action. |
 | [`implement`](skills/implement/SKILL.md) | Implement a defined change, verify it, and review and fix material issues before delivery. |
+| [`maintain-verification-skill`](skills/maintain-verification-skill/SKILL.md) | Check a project's verification instructions against source and live behavior, and fix drift. |
 | [`plan`](skills/plan/SKILL.md) | Define the approach, acceptance checks, and irrefutable proof for a software change. |
 | [`product-spec`](skills/product-spec/SKILL.md) | Define the user problem, desired outcome, and what success looks like. |
 | [`project-plan`](skills/project-plan/SKILL.md) | Shape an initial project plan with scope, milestones, dependencies, and the specs needed next. |
@@ -62,6 +64,17 @@ In the implementation loop, the reviewer reports findings and the implementing
 agent owns fixes. A standalone review leaves code unchanged unless fixes are
 also requested.
 
+Use `create-verification-skill` to capture how to launch, drive, and verify a
+project in a project-local `verify-<project>` skill and feature map. Use
+`maintain-verification-skill` for an explicit audit of those instructions,
+keeping documentation and harness fixes separate from product regressions.
+Neither is a mandatory delivery stage. `research`, `plan`, and `implement`
+reuse an existing project verification skill when relevant; normal delivery
+collects fresh evidence and updates affected recipes within scope, rather than
+running a full maintenance audit. Recipes live in the project skill; observed
+results belong in the task record or artifacts. Reviews still assess the
+actual evidence, and prototypes may reuse recipes without requiring upkeep.
+
 Use `session-review` when reviewing selected past sessions, not after every
 task. It uses transcript and artifact evidence to recommend narrow improvements;
 it does not automatically edit skills or project guidance.
@@ -71,6 +84,10 @@ it does not automatically edit skills or project guidance.
 - `blast-radius` is adapted from
   [pstack's blast-radius](https://github.com/cursor/plugins/blob/main/pstack/skills/blast-radius/SKILL.md).
 - `bro` is adapted from [backnotprop/bro](https://github.com/backnotprop/bro).
+- `create-verification-skill` and `maintain-verification-skill` are adapted from
+  [pstack's creation](https://github.com/cursor/plugins/blob/main/pstack/skills/create-verification-skill/SKILL.md)
+  and [maintenance](https://github.com/cursor/plugins/blob/main/pstack/skills/maintain-verification-skill/SKILL.md)
+  skills, with their MIT license preserved in each skill directory.
 - `grill-me` is adapted from
   [Matt Pocock's original skill](https://github.com/mattpocock/skills/blob/a6bdfd9fed6c17d21b306aeb7ff6a0de8b72ef3c/grill-me/SKILL.md).
 - `handoff` is adapted from
@@ -135,8 +152,12 @@ Installing those workflows or `deliver` includes `adr` so it is available when
 needed. `grill-me` records ADRs only when explicitly requested and does not
 install `adr` automatically; install it separately when needed.
 
-`prototype`, `session-review`, `blast-radius`, `code-review`, and `design-review`
-have no companion dependencies. Reviews explain their findings directly in
+`prototype`, `session-review`, `blast-radius`, `code-review`, `design-review`,
+`create-verification-skill`, and `maintain-verification-skill` have no companion
+dependencies. The verification-authoring skills are installed independently;
+workflow discovery hooks do not add them as companions. Generated project
+verification skills stay in their projects, not this collection.
+Reviews explain their findings directly in
 plain language; `bro` remains available for standalone simplification requests.
 If you copy workflow folders manually, include their companions too. Rerunning
 the installer does not remove previously installed skills.
@@ -190,5 +211,9 @@ separately from deterministic tooling CI.
 
 ## License
 
-Licensed under the [Apache License 2.0](LICENSE), except for `handoff`,
-which retains its [MIT license](skills/handoff/LICENSE).
+Licensed under the [Apache License 2.0](LICENSE), except for these MIT-licensed
+adaptations:
+
+- [`handoff`](skills/handoff/LICENSE)
+- [`create-verification-skill`](skills/create-verification-skill/LICENSE)
+- [`maintain-verification-skill`](skills/maintain-verification-skill/LICENSE)

@@ -120,6 +120,8 @@ class InstallerTests(unittest.TestCase):
             "deliver": {"deliver", "grill-me", "research", "plan", "implement",
                         "design-review", "blast-radius", "code-review", "adr"},
             "implement": {"implement", "code-review", "adr"},
+            "research": {"research", "adr"},
+            "plan": {"plan", "adr"},
         }
         for skill, expected in workflows.items():
             for harness in ("codex", "pi", "claude"):
@@ -139,7 +141,8 @@ class InstallerTests(unittest.TestCase):
 
     def test_independent_skills_install_without_companions(self):
         for skill in ("prototype", "session-review", "code-review", "design-review",
-                      "blast-radius", "bro"):
+                      "blast-radius", "bro", "create-verification-skill",
+                      "maintain-verification-skill"):
             for harness in ("codex", "pi", "claude"):
                 with self.subTest(skill=skill, harness=harness):
                     self.agents = self.root / skill / harness / "agents"

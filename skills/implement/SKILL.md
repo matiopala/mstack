@@ -67,6 +67,12 @@ and resolve the decision with the user. Honor authorization already given.
 Require irrefutable proof: reproducible, inspectable evidence that the
 acceptance criteria hold under the stated test conditions.
 
+Use relevant recipes from an existing project verification skill to collect
+fresh evidence. Update affected recipes within the authorized change scope;
+do not weaken expected behavior to match a regression. Keep reusable steps in
+the skill and observed results in the task record or artifacts. Do not require
+skill creation or a full maintenance audit for routine delivery.
+
 Exercise the relevant user or system entry point without bypassing the changed
 logic. Observe both the action and its result. Verify required side effects;
 for persisted state, use a fresh read or restart where appropriate.
