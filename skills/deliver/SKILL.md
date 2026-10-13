@@ -19,17 +19,12 @@ boundary.
 
 ## Task records
 
-When working from a task file or tracker issue, read its brief, status, and
-relevant linked context. Use it as the authoritative working record. Preserve
-the agreed brief and acceptance criteria, and record consequential changes
-explicitly.
-
-Add research findings, the implementation plan, progress, and verification
-evidence to that same record in its existing location. Maintain one authoritative
-task record; link to it rather than creating duplicate task or delivery records.
-
-A task record is optional. For standalone requests, work from the available
-context and follow the user's requested output format and project conventions.
+Task records are optional. When working from a task file or tracker issue,
+read its brief, status, and relevant linked context. Use it as the single
+authoritative record across stages: preserve the agreed brief and acceptance
+criteria, record consequential revisions, and add findings, plans, progress,
+and evidence in place. Otherwise, work from the available context and follow
+the user's requested output format and project conventions.
 
 ## 1. Interview
 
@@ -37,9 +32,8 @@ Use [grill-me](../grill-me/SKILL.md) to clarify the desired outcome, scope,
 constraints, concrete acceptance examples, and existing behavior that must
 remain working. Ask only about consequential gaps not settled by available
 context. When these are sufficiently clear to guide research and planning,
-carry the interview summary into the next authorized stage without another
-approval question. If they are already clear, proceed without additional
-interview questions.
+carry the interview summary into the next authorized stage. If they are
+already clear, proceed without additional interview questions.
 
 ## 2. Research
 

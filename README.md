@@ -41,10 +41,7 @@ still needs appropriate measurements or checks.
 
 Use `implement` for a defined change. It owns implementation, verification,
 code review, and fixes until the final evidence supports completion and no
-material review findings remain. It prefers one reviewer subagent when available
-and permitted; otherwise it performs and identifies self-review. After fixes,
-it reruns affected checks and reviews their consequences. Optional polish does
-not keep the loop running.
+material review findings remain.
 
 `deliver` ties together `grill-me`, `research`, `plan`, and `implement` when the
 full workflow is wanted. It inherits the implementation review loop rather than
