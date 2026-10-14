@@ -42,8 +42,12 @@ Write for an agent arriving without this conversation. Include what applies:
   effects, tested code state, and relevant limitations or mocks. Verify
   persistence with a fresh read where appropriate.
 - Isolated state and cleanup of only resources the run owns, including failed
-  attempts. Never kill by process name or delete evidence. Name an artifact
-  location separate from disposable state.
+  attempts. Never kill by process name. Preserve sanitized evidence in an
+  artifact location separate from disposable state.
+
+Keep secrets and unnecessary sensitive data out of recorded commands and
+artifacts. Disable tracing around credential setup and commands that expand
+secrets; redact sensitive output before retaining it.
 
 Use safe local or test environments; check actual side effects rather than
 trusting a dry-run label. Document any shared-instance restrictions.

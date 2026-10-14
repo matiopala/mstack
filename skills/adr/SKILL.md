@@ -30,10 +30,12 @@ waiting for a separate documentation request. Before handoff, check for
 significant decisions left only in conversation. Honor requests to discuss
 only or avoid file edits.
 
-- **Accepted:** An explicit user decision or approval, including an existing
-  documented approval. Recording it requires no repeated confirmation.
-- **Proposed:** An agent recommendation, inferred choice, or decision whose
-  acceptance is unclear. Do not present it as settled.
+- **Accepted:** An explicit user decision or approval, or a decision made within
+  authority explicitly delegated by the user. Briefly identify the basis in
+  the existing rationale. Recording it requires no repeated confirmation.
+- **Proposed:** A recommendation not yet accepted, a choice without established
+  decision authority, or a decision whose acceptance is unclear. Do not present
+  it as settled.
 
 Accepted describes agreement, not implementation or verification. Recording
 a decision does not authorize implementation, change agreed task scope or

@@ -43,8 +43,12 @@ covered; one passing path does not establish another. For unreachable paths,
 record the attempt and unmet prerequisite, not a pass.
 
 Capture actions, expected and observed results, side effects, code state, and
-limitations. Clean up owned resources after failures and at completion; do not
-disturb shared instances or unrelated state. Confirm evidence survives every
+limitations. Keep secrets and unnecessary sensitive data out of recorded
+commands and artifacts. Disable tracing around credential setup and commands
+that expand secrets; redact sensitive output before retaining it.
+
+Clean up owned resources after failures and at completion; do not disturb
+shared instances or unrelated state. Confirm sanitized evidence survives every
 cleanup. Do not trust a dry-run label as proof of harmlessness.
 
 ## Correct and report
