@@ -6,6 +6,7 @@ description: Break a larger software design, architecture, or feature specificat
 Turn the supplied design into coherent tasks that collectively deliver its
 intended outcome. Each implementation task should normally fit one focused
 PR that a reviewer can understand, verify, and accept independently.
+If the work already fits one coherent PR, use one task; do not invent a split.
 
 ## 1. Understand the goal and constraints
 
@@ -43,7 +44,8 @@ in a valid, testable state without relying on unfinished follow-up work for
 correctness. User-facing availability may come later.
 
 Include necessary failure handling, acceptance tests, and regression
-protection within the task that introduces the behavior.
+protection within the task that introduces the behavior. Keep documentation
+and verification with the change unless separate delivery has a concrete benefit.
 
 Preserve the larger design's shared decisions. Reference their authoritative
 source and include enough relevant context for an implementer to proceed.
@@ -67,13 +69,6 @@ boundaries.
 
 ## 4. Define acceptance and irrefutable proof
 
-For each task, specify:
-
-- Concrete acceptance scenarios.
-- Expected observable results.
-- The tests or checks that demonstrate those results.
-- Relevant existing behavior that must remain working.
-
 Require irrefutable proof: reproducible, inspectable evidence that the
 acceptance criteria hold under the stated test conditions.
 
@@ -89,9 +84,6 @@ Establish expected behavior before implementation. Do not weaken acceptance
 criteria to accommodate the resulting code.
 
 ## 5. Order and reconcile the tasks
-
-Give tasks stable identifiers and explicit dependencies. For each dependency,
-state the capability, contract, or decision being consumed.
 
 Order work to expose significant uncertainty and integration risks early.
 Where useful, begin with a narrow working path through the affected components.
@@ -112,31 +104,26 @@ decomposition while preserving completed work and acceptance criteria.
 
 ## Output
 
-Present the overall goal, an ordered task list with dependencies, and a
-concise brief for each task:
+Present the goal and ordered tasks. Keep each brief proportional to the
+coordination needed:
 
-- ID and title: the observable outcome.
-- Context: relevant design references, existing behavior, and constraints.
-- Scope: what the task owns and boundaries needed to prevent overlap.
-- Dependencies: prerequisites and what is consumed from each.
-- Acceptance and irrefutable proof: scenarios, expected results, and evidence.
-- Regression protection: affected existing behavior and relevant checks.
-- Expected size and uncertainty: likely affected areas, approximate
-  implementation size, and factors that could require another split.
+- Stable ID and observable outcome.
+- Scope of the change.
+- Dependencies, when any: prerequisite IDs and what they supply.
+- Acceptance: required behavior, affected existing behavior, and the checks
+  and observable evidence that establish both.
 
-Identify the owner of final integrated verification and any unresolved
-questions or provisional estimates.
+Link relevant context instead of restating the design or generic delivery
+instructions. Add expanded context, estimates, or separate regression details
+only when they affect task boundaries or execution. Flag unresolved questions
+that could change the work.
 
-Follow the user's requested output format and destination, then existing
-repository conventions. Otherwise, save artifacts under
-`docs/features/<feature>/tasks/`, with an `index.md` and one file per task
-named by its stable ID, such as `T01.md`.
+Follow the user's requested format and destination, then repository conventions.
+Otherwise, use one document at `docs/features/<feature>/tasks.md`. Create an
+index and individual task records when size or independent tracking makes
+that useful, using stable IDs such as `T01.md` under `tasks/`.
 
-Use the index for the overall goal, task ordering, dependencies, and links
-to task files. Each task file owns its brief, acceptance criteria, and status,
-and can later hold its implementation plan, progress, and verification evidence.
-
-Maintain one authoritative task record. If the user chooses an issue tracker,
+Keep one authoritative record per task. If the user chooses an issue tracker,
 use that destination and link to it rather than maintaining duplicate briefs.
 When revising a decomposition, update existing records and preserve task IDs,
 progress, implementation plans, and evidence.

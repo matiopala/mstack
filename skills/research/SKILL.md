@@ -15,8 +15,9 @@ Read the question, intended outcome, scope, and available requirements. When
 given a task record, read its brief, status, and relevant linked context.
 Reuse findings from earlier discussion and investigation.
 
-Ask one consequential question at a time when needed to focus the research.
-Investigate available context before asking for facts inspection could establish.
+Ask only about consequential gaps that available context cannot resolve.
+Investigate factual gaps before asking; resolve dependent questions in order
+and group independent questions when useful.
 
 Consult relevant accepted decision records. Load [adr](../adr/SKILL.md) only
 when a consequential choice warrants creating or revising a record.

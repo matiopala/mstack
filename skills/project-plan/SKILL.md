@@ -22,10 +22,10 @@ specific questions about current state, constraints, and dependencies before
 asking for facts inspection could establish. Keep investigation focused on
 project planning; leave detailed design to specifications.
 
-Ask one consequential question at a time and wait for the answer. Challenge
-weak assumptions and recommend concrete scope or staging choices when useful.
-Resolve consequential choices with the user, reusing settled decisions unless
-new evidence changes their implications.
+Ask only about consequential gaps that available context cannot resolve.
+Resolve dependent questions in order; group independent questions when useful.
+Challenge weak assumptions and recommend concrete scope or staging choices.
+Reuse settled decisions unless new evidence changes their implications.
 
 Distinguish observed facts, agreed requirements, assumptions, and proposals.
 When a larger unknown could change scope or sequencing, identify the bounded
@@ -33,14 +33,11 @@ investigation needed and the decision its evidence must enable.
 
 ## Gather constraints
 
-Ask the user for project or milestone estimates and deadlines that have not
-already been supplied, along with relevant capacity and other constraints.
-Estimates and deadlines must come from the user. Preserve their meaning and
-any stated assumptions when structuring them in the plan.
-
-Never generate or propose estimates, durations, or delivery dates, or derive
-a schedule of your own. If the user has none to provide, leave them unspecified
-and continue planning unless the gap prevents a consequential project decision.
+Ask for missing user estimates, deadlines, capacity, and other constraints;
+preserve their meaning and stated assumptions. Never generate estimates,
+durations, delivery dates, or a schedule yourself. If the user has none, leave
+them unspecified and continue unless a consequential project decision depends
+on them.
 
 Flag conflicts supported by the available scope, dependencies, and constraints.
 Recommend scope cuts or staging options for the user to decide, without offering
@@ -70,10 +67,8 @@ the milestones they affect.
 
 ## Artifact and handoff
 
-Create one authoritative project plan containing the goal and outcomes, scope
-and exclusions, capabilities, milestones and dependencies, supplied constraints,
-risks and open questions, and the specification handoff described above.
-Scale the structure to the project.
+Create one authoritative plan covering the decisions and milestone structure
+above, scaled to the project.
 
 Follow the user's requested format and destination, then repository
 conventions. Otherwise, save to:
@@ -86,10 +81,9 @@ planning; ongoing replanning and delivery tracking are outside its scope.
 Detailed requirements, technical contracts, and task records belong in their
 respective artifacts.
 
-Mark the plan ready for specification work when project boundaries, observable
-completion, the first milestone, and the next design questions are clear.
-Unresolved project-level decisions keep it a draft; name what is needed to
-proceed. Technical details may remain open for subsequent specs.
+Unresolved project-level decisions keep the plan a draft; name what is needed
+to proceed. Otherwise, mark it ready for specification work, leaving technical
+details to the identified specs.
 
 Finish with the artifact location, agreed project outcome, readiness status,
 and specifications or investigations needed next. Creating those artifacts,

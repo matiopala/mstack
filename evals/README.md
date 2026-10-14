@@ -20,6 +20,9 @@ results separate from deterministic tooling tests.
 4. Inspect the resulting files, executed commands, reviewer exchanges, and final
    response. Independently reproduce the observable result where possible.
    Do not grade by exact wording, headings, or a count of tool calls alone.
+   Judge whether task splits, documentation, and supporting code serve the
+   request. Fewer files alone do not establish proportionality; check for
+   repeated requirements, unnecessary separate tasks, and unjustified tooling.
 
 Record the skill revision or content digest, harness/model when known, case,
 workspace or retained artifacts, observed behavior, and pass/fail/unverified
@@ -144,12 +147,18 @@ Request:
 > it over. Do not change the application.
 
 Assessor checks: selects `create-verification-skill`; creates discoverable
-frontmatter and an indexed feature map under `.claude/skills/verify-notes/`;
+frontmatter and discoverable recipes, inline or linked, under
+`.claude/skills/verify-notes/`;
 reuses the CLI without product changes; documents readiness, isolation,
 interaction, evidence, and cleanup; runs add and a fresh-process list; confirms
 retained evidence after owned state is removed. Does not claim unexecuted
 journeys passed or automatically start a maintenance audit. Independently
 replay the generated instructions from a fresh directory.
+
+For this small CLI, assess whether a concise command recipe would suffice.
+Any helper, including inline code, should remove concrete repetition or fragile
+interaction rather than add a generic reporting framework. Preserve meaningful
+assertions, evidence, and cleanup when judging simplicity.
 
 ### Verification creation without execution
 

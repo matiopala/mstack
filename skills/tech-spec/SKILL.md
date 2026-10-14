@@ -19,9 +19,9 @@ creating or revising a record.
 Identify the intended outcomes, scope, constraints, acceptance criteria,
 and existing behavior that must remain working.
 
-Reuse settled decisions. Ask one consequential question at a time when
-intent or a tradeoff remains unclear. Investigate relevant context before
-asking questions that available evidence could answer.
+Reuse settled decisions. Ask only about consequential gaps that available
+context cannot resolve. Resolve dependent questions in order; group independent
+questions when useful.
 
 Distinguish requirements, observed facts, assumptions, and proposed decisions.
 Clarify assumptions that could materially change the solution.
@@ -104,33 +104,17 @@ Define required evidence here; record actual results during implementation.
 
 ## 6. Check readiness for decomposition
 
-Check that:
-
-- Every required outcome has a technical treatment and verification approach.
-- Shared contracts, ownership, and important invariants are clear.
-- Consequential design decisions are resolved.
-- Compatibility and intermediate-state constraints are identified.
-- Remaining implementation choices can be made locally without changing
-  the agreed behavior or forcing conflicting decisions across tasks.
-
-If these conditions are unmet, name the unresolved questions and the evidence
-or user decisions needed. Label the specification as a draft.
-
-A ready specification should allow decomposition without inventing
-consequential contracts or behavior.
+Mark the specification ready when consequential behavior, contracts, ownership,
+invariants, compatibility, and verification are settled enough for tasks to
+proceed independently, including intermediate states. Remaining choices must
+be local to implementation. Otherwise, label it a draft and identify the
+missing evidence or decisions.
 
 ## Output
 
-Create or update one authoritative technical specification containing:
-
-- Goal, requirements, and scope.
-- Relevant current state and supporting references.
-- Proposed final state and technical design.
-- Consequential decisions and rationale.
-- Acceptance scenarios, regression protection, and required proof.
-- Remaining uncertainties and readiness for decomposition.
-
-Include only sections relevant to the work.
+Create or update one authoritative specification covering the relevant
+requirements, current state, design, decisions, verification, and remaining
+uncertainties described above. Include supporting references.
 
 Follow the user's requested format and destination, then existing repository
 conventions. Otherwise, save to:

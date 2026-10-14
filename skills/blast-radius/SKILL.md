@@ -22,9 +22,9 @@ Prioritize by impact and realistic exposure; do not invent probability estimates
 ## Check the risks
 
 Identify the assumptions that protect affected behavior. Run focused checks
-against real components to test those assumptions. Reuse existing regression
-tests; add a small reproduction when needed. Use integration or end-to-end
-checks when the risk crosses a boundary.
+when they resolve a concrete uncertainty; source-backed assessment can otherwise
+suffice. Reuse existing regression tests or a small reproduction, exercising
+real components and affected boundaries.
 
 Distinguish source-based reasoning from executed checks and observations in
 the running app. Record what ran, the result, and relevant code state and
@@ -49,5 +49,5 @@ Lead with the most important consequence, then cover:
 - Risks checked and ruled out, with the evidence and its limits.
 - The smallest fixes or regression checks needed before delivery.
 
-Return the plain-language review directly. Do not imply that checking the
-identified risks proves the entire system free of regressions.
+Do not imply that checking the identified risks proves the entire system
+free of regressions.

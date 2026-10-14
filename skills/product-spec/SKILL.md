@@ -12,9 +12,9 @@ Link the records from the specification.
 
 ## Discover
 
-Reuse established context and decisions. Ask one consequential question at
-a time, investigating available evidence before asking for facts that
-inspection could establish.
+Reuse established context and decisions. Ask only about consequential gaps
+that available context cannot resolve. Investigate factual gaps before asking;
+resolve dependent questions in order and group independent questions when useful.
 
 Clarify who experiences the problem, when it occurs, their current workaround,
 and why improvement matters. Connect requested features to this underlying

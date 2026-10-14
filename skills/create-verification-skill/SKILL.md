@@ -10,8 +10,8 @@ https://github.com/cursor/plugins/blob/main/pstack/skills/create-verification-sk
 ## Inspect the project
 
 Discover user-facing surfaces, documented startup, prerequisites, existing
-harnesses, observable results, and isolation options. Reuse working tools
-before adding helpers. Ask only what inspection cannot establish.
+harnesses, observable results, and isolation options. Ask only what inspection
+cannot establish.
 
 Check for an existing verification skill before creating another. Follow the
 project's skill-location conventions; if absent, establish the target harness
@@ -22,15 +22,22 @@ product problems without authorization; report startup blockers precisely.
 ## Write the project skill
 
 Create `verify-<project>/SKILL.md` with valid name and description frontmatter.
-Write for an agent arriving without this conversation. Include:
+Default to direct project commands, expected results, and cleanup in a short
+recipe. Existing test output or a plain transcript is usually sufficient
+evidence; do not build custom logging or reporting code merely to retain it.
+Add helpers, including inline code, only when they simplify repeated or fragile
+project interactions or checks. Make helper scripts executable and show their invocation.
 
-- Exact setup and launch commands, dependencies, configuration, authentication,
-  migrations or seed data, and a readiness check that establishes usability.
-- A read-only health check for the correct instance, build, state, and access;
-  run it before driving and after unexpected failures. Reset or relaunch when
-  health checks cannot detect a stuck interaction.
+Write for an agent arriving without this conversation. Include what applies:
+
+- Relevant prerequisites and exact setup and launch commands. Include
+  authentication, migrations, and seed data only when the journey needs them.
+- For long-running or shared instances, a read-only health check for the
+  correct instance, build, state, and access before driving and after unexpected
+  failures. Include reset or relaunch steps for stuck interactions.
 - Reproducible interaction commands through real user or system entry points,
-  using stable selectors or handles. Do not bypass the behavior being proved.
+  with stable selectors or handles where needed. Do not bypass the behavior
+  being proved.
 - Evidence capture: actions, expected and observed results, required side
   effects, tested code state, and relevant limitations or mocks. Verify
   persistence with a fresh read where appropriate.
@@ -39,22 +46,21 @@ Write for an agent arriving without this conversation. Include:
   location separate from disposable state.
 
 Use safe local or test environments; check actual side effects rather than
-trusting a dry-run label. Document any shared-instance restrictions. Make
-owned helper scripts executable and show their invocation.
+trusting a dry-run label. Document any shared-instance restrictions.
 
 ## Map important journeys
 
-Add `features/README.md` as an index and a small set of feature recipes.
-Each describes the user-visible behavior, entry points, prerequisites, exact
-actions, observable proof, and gotchas. Link existing checks instead of
-duplicating them. Identify unmapped scope and unexecuted recipes; proving one
-entry point does not prove another.
+Keep short recipes in `SKILL.md`; split them into linked feature files with
+a `features/README.md` index when their number or detail warrants it. Group
+recipes by user-visible behavior, noting any journey-specific prerequisites
+or gotchas. Link existing checks instead of duplicating them. Identify unmapped
+scope and unexecuted recipes; proving one entry point does not prove another.
 
 ## Prove and hand off
 
-Follow the generated instructions through setup, health check, one complete
-mapped journey, evidence capture, and cleanup. Confirm artifacts survive
-cleanup, including failed iterations. Fix instruction or harness errors and
+Replay one complete journey using the generated setup, interaction, evidence,
+and cleanup instructions, including applicable health checks. Confirm artifacts
+survive cleanup, including failed iterations. Fix instruction or harness errors and
 rerun affected steps; never weaken expected behavior to force a pass.
 
 Report the skill path, executed journey, evidence, and remaining gaps. Without

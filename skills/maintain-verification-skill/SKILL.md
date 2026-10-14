@@ -9,7 +9,8 @@ https://github.com/cursor/plugins/blob/main/pstack/skills/maintain-verification-
 
 ## Establish scope
 
-Locate the project verification skill, its feature map, and owned helpers.
+Locate the project verification skill, its inline or linked recipes, and
+owned helpers.
 If several targets are plausible, ask which; if none exists, recommend
 `create-verification-skill` instead of inventing a target.
 
@@ -19,7 +20,7 @@ product code, create branches, commit, or open PRs unless separately authorized.
 
 ## Check for drift
 
-Within scope, reconcile index entries with their files and compare recipes
+Within scope, reconcile any index entries with their files and compare recipes
 with current source, requirements, and accepted decisions. For a full audit,
 also check recent changes for missing user journeys, citing concrete entry
 points. Reuse existing checks and investigate only relevant boundaries.

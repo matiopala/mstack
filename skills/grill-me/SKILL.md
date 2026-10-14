@@ -25,19 +25,10 @@ respectfully. Keep questions focused on gaps that matter to the requested scope.
 ## Completion and handoff
 
 Finish when the goal, scope, relevant constraints, and consequential decisions
-within that scope are clear. Do not extend the interview into unrelated or
-later decisions. If the user chooses to stop, close with the remaining gaps
-explicit.
-
-Summarize the shared understanding, decisions, and remaining uncertainties.
-
-- **Standalone interview:** Return the summary. Continue with further work only
-  when covered by the user's request or existing authorization; an interview-only
-  request ends with the summary.
-- **Within `deliver`:** Use its interview completion criteria. Once satisfied,
-  carry the summary into the next authorized stage without asking for renewed
-  approval. If existing context already satisfies those criteria, proceed
-  without additional questions. Honor a request to stop instead of advancing.
+are clear, including any completion criteria from the calling workflow. Skip
+questions already answered by context. Summarize decisions and remaining gaps;
+continue directly into further work already authorized. An interview-only
+request or a request to stop ends with the summary.
 
 Keep findings in the conversation unless the requested output or calling
 workflow requires a record. Create ADRs only when the user explicitly requests

@@ -13,9 +13,10 @@ Read the intended outcome, scope, constraints, acceptance criteria, and
 available research. When given a task record, read its brief, status, and
 relevant linked context. Reuse settled decisions and completed work.
 
-Inspect affected code and tests to resolve specific gaps. Ask one consequential
-question at a time when available evidence cannot settle a requirement or
-tradeoff. Prior interview or research artifacts are helpful, not prerequisites.
+Inspect affected code and tests to resolve specific gaps. Ask only about
+consequential gaps that available context cannot resolve. Resolve dependent
+questions in order; group independent questions when useful. Prior interview
+or research artifacts are helpful, not prerequisites.
 
 Consult relevant accepted decision records. Load [adr](../adr/SKILL.md) only
 when a consequential planning choice warrants creating or revising a record.
@@ -27,24 +28,18 @@ that achieves it, including consequential interface, data, compatibility,
 and failure-handling decisions. Use phases when they make work easier to
 verify. Leave routine coding details to implementation.
 
-For every goal, define:
+Map each acceptance criterion to a check and the observable evidence needed
+before claiming delivery. Specify the scenario, expected result, prerequisites,
+and commands for existing checks when known. For checks to create, describe
+the scenario and intended entry point; do not invent executable commands.
 
-- Acceptance scenarios and expected observable results.
-- The existing checks to run and new checks to create, including prerequisites,
-  commands when known, and the observable results they must establish.
-- The irrefutable proof to collect before claiming delivery.
+Checks must exercise the relevant user or system entry point and establish
+required side effects. Irrefutable proof is reproducible, inspectable evidence
+that the criteria hold under the stated test conditions.
 
 Reuse relevant journeys from an existing project verification skill when
 choosing checks, noting any recipe gaps. Creating a skill or auditing its whole
 map is separate work, not a prerequisite for planning this change.
-
-Define irrefutable proof as reproducible, inspectable evidence that the
-acceptance criteria hold under the stated test conditions.
-
-Choose checks that exercise the relevant user or system entry point and
-observe the resulting behavior, including required side effects. For a check
-that does not exist yet, specify its scenario and intended entry point;
-do not invent an executable command or imply it already runs.
 
 Include regression checks for affected existing functionality. Favor
 integration and end-to-end tests that exercise meaningful behavior through
