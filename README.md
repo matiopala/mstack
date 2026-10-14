@@ -26,6 +26,7 @@ with Codex, Pi, and Claude Code.
 | [`grill-me`](skills/grill-me/SKILL.md) | Get interviewed about an idea, surface assumptions, and clarify what I actually want. |
 | [`handoff`](skills/handoff/SKILL.md) | Pass the current work to a fresh agent with artifact references, verification status, and an exact next action. |
 | [`implement`](skills/implement/SKILL.md) | Implement a defined change, verify it, and review and fix material issues before delivery. |
+| [`in-your-own-words`](skills/in-your-own-words/SKILL.md) | Check the agent's understanding of my intent, constraints, and assumptions. |
 | [`maintain-verification-skill`](skills/maintain-verification-skill/SKILL.md) | Check a project's verification instructions against source and live behavior, and fix drift. |
 | [`plan`](skills/plan/SKILL.md) | Define the approach, acceptance checks, and irrefutable proof for a software change. |
 | [`product-spec`](skills/product-spec/SKILL.md) | Define the user problem, desired outcome, and what success looks like. |
@@ -93,6 +94,9 @@ it does not automatically edit skills or project guidance.
 - `handoff` is adapted from
   [Matt Pocock's handoff](https://github.com/mattpocock/skills/blob/0f5e033ebc47b142f5ffa56a582ede6d9d9bada3/skills/productivity/handoff/SKILL.md),
   with its [MIT license](skills/handoff/LICENSE) preserved.
+- `in-your-own-words` is adapted from
+  [pstack's in-your-own-words](https://github.com/cursor/plugins/blob/main/pstack/skills/in-your-own-words/SKILL.md),
+  with its [MIT license](skills/in-your-own-words/LICENSE) preserved.
 - `show-me` is inspired by [HumanLayer's show-me](https://github.com/humanlayer/skills/tree/main/plugins/show-me).
 - `deliver` and its extracted `research`, `plan`, and `implement` stages draw on
   [HumanLayer's research-plan-implement workflow](https://github.com/humanlayer/humanlayer/tree/main/.claude/commands).
@@ -215,5 +219,6 @@ Licensed under the [Apache License 2.0](LICENSE), except for these MIT-licensed
 adaptations:
 
 - [`handoff`](skills/handoff/LICENSE)
+- [`in-your-own-words`](skills/in-your-own-words/LICENSE)
 - [`create-verification-skill`](skills/create-verification-skill/LICENSE)
 - [`maintain-verification-skill`](skills/maintain-verification-skill/LICENSE)
