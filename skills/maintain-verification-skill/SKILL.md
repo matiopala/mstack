@@ -32,10 +32,10 @@ live driving to avoid shared-state interference.
 
 ## Exercise the map
 
-Follow the skill's own launch and isolation model. Health-check before driving
-and after unexpected failures; reset or relaunch if the interaction is stuck
-despite a healthy process. Fix confirmed health-check drift and retry safely
-before declaring the environment blocked.
+Follow the skill's own launch and isolation model. For long-running or shared
+instances, health-check before driving and after unexpected failures; reset
+or relaunch if the interaction is stuck despite a healthy process. Fix confirmed
+health-check drift and retry safely before declaring the environment blocked.
 
 A full audit requires source and live coverage of every mapped feature.
 Exercise the documented entry points and report exactly which paths were
