@@ -51,9 +51,15 @@ covered; one passing path does not establish another. For unreachable paths,
 record the attempt and unmet prerequisite, not a pass.
 
 Capture actions, expected and observed results, side effects, code state, and
-limitations. Keep secrets and unnecessary sensitive data out of recorded
-commands and artifacts. Disable tracing around credential setup and commands
-that expand secrets; redact sensitive output before retaining it.
+limitations. Existing check output or a plain transcript is usually sufficient
+evidence; do not build custom logging or reporting code merely to retain it.
+Add helpers, including inline code, only when they simplify repeated or fragile
+interactions or checks. Keep additional records only when they serve a distinct
+purpose rather than duplicate captured results or metadata.
+
+Keep secrets and unnecessary sensitive data out of recorded commands and
+artifacts. Disable tracing around credential setup and commands that expand
+secrets; redact sensitive output before retaining it.
 
 Clean up owned resources after failures and at completion; do not disturb
 shared instances or unrelated state. Confirm sanitized evidence survives every
@@ -67,9 +73,9 @@ recipes live. Report product regressions separately without weakening expected
 behavior; record a known failure when useful, preserving the intended result.
 
 Report scope, source and live coverage, corrections, evidence locations, and
-remaining failures or blockers. Call the map clean only after full coverage
-with no unresolved gaps; a scoped pass is not a whole-map clean verdict.
-Unexecuted corrections remain unverified.
+remaining failures or blockers. Reference retained evidence instead of repeating
+it. Call the map clean only after full coverage with no unresolved gaps; a scoped
+pass is not a whole-map clean verdict. Unexecuted corrections remain unverified.
 
 Keep reusable instructions in the skill and run-specific results in the task
 record or artifacts. Do not commit scratch logs or treat an old successful run
