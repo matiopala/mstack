@@ -44,8 +44,13 @@ Apply these principles:
 
 - Make the smallest correct change that fully achieves the goal and fits
   existing conventions.
-- Minimize complexity. Add abstractions, configuration, and infrastructure
-  only for concrete needs. Measure before optimizing.
+- Apply YAGNI: add features, abstractions, configuration, and infrastructure
+  only for current requirements or concrete constraints. Measure before optimizing.
+- Prefer suitable existing project code, standard-library or platform features,
+  and installed dependencies before adding custom code or a new dependency.
+- Default to no comments. Add a brief comment only for non-obvious reasons or
+  constraints the code cannot express. Preserve required documentation, legal
+  notices, and tool directives.
 - Give each module one coherent responsibility and a small interface.
   Hide its implementation complexity. Avoid empty forwarding layers.
 - Keep boundaries explicit. Validate external data, expose dependencies,

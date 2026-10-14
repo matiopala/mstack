@@ -11,6 +11,10 @@ Build the smallest useful version, try it, and adjust based on what happens.
 Keep choices simple and local. Stop when the goal is achieved or a concrete
 blocker prevents further progress.
 
+Default to no comments. Add a brief comment only for non-obvious reasons or
+constraints the code cannot express. Preserve required documentation, legal
+notices, and tool directives.
+
 Choose checks that establish the requested outcome. A working demonstration
 may be enough for a functional idea. If the goal is latency, measure it under
 relevant conditions; if the goal is quality, define and check that quality.

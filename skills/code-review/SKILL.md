@@ -68,8 +68,9 @@ risk without weakening required acceptance proof.
 Judge the code against these principles:
 
 - Make the smallest correct change within scope and existing conventions.
-- Prefer simple, explicit code. Justify abstractions, configuration, and
-  dependencies with concrete needs; support performance claims with measurements.
+- Prefer simple, explicit code and suitable existing implementations. Justify
+  added abstractions, configuration, and dependencies with current requirements
+  or concrete constraints; support performance claims with measurements.
 - Give each module one coherent responsibility and a small interface that hides
   complexity. Avoid forwarding layers without a useful purpose.
 - Keep ownership and dependencies explicit, validate external data at system
