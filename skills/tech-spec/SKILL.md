@@ -79,7 +79,8 @@ evidence and acknowledge the costs of the chosen approach.
 
 For choices captured in ADRs, summarize their effect on the proposed solution
 and link to the records for rationale, alternatives, and consequences.
-Keep smaller decisions inline without repeating requirements or design details.
+Keep decisions not requiring a separate ADR inline without repeating
+requirements or design details.
 
 ## 5. Define acceptance and irrefutable proof
 

@@ -54,11 +54,12 @@ still hold, and address material findings within the authorized scope.
 
 ## 4. Implement, verify, and review
 
-For changes to shared contracts, persisted data, lifecycle behavior, or other
-concrete downstream risks, use [blast-radius](../blast-radius/SKILL.md) to
-identify the regression checks and assumptions to verify. Carry these into
-the plan and check them against the final code. Keep review effort proportional
-to the change.
+Reuse downstream risk analysis from research and planning, including effects
+on shared contracts, persisted data, and lifecycle behavior. Use
+[blast-radius](../blast-radius/SKILL.md) when concrete downstream questions
+remain unresolved or new evidence introduces risks. Carry the assumptions and
+regression checks into the plan and check them against the final code. Keep
+review effort proportional to the change.
 
 Use [implement](../implement/SKILL.md) to make the scoped change, verify it
 against the agreed criteria, and complete its review-and-fix loop. Let that

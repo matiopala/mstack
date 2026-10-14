@@ -12,10 +12,12 @@ Read the repository's decision conventions, index, and relevant records.
 Follow amendment and supersession links to establish the current accepted
 direction. Reuse existing records rather than duplicating a decision.
 
-Create an ADR when a consequential tradeoff establishes a durable constraint
-or its rationale will matter across tasks or sessions. This includes product
-policy as well as technical design. Keep routine coding choices, requirements,
-and task progress in their existing artifacts.
+Create an ADR when explicitly requested, required by project conventions, or
+when a consequential product or technical decision needs broader reuse or
+independent revision history. Keep feature-specific rationale in its existing
+authoritative specification or task record when that is sufficient; reuse in
+a later session alone does not warrant a separate ADR. Keep routine coding
+choices, requirements, and task progress in their existing artifacts.
 
 Give each record one independently reconsiderable decision. Do not settle
 unrelated future questions to complete it; record those uncertainties without
@@ -57,10 +59,11 @@ Keep each record concise and understandable outside its originating session:
 Do not invent rationale, alternatives, approval, or source links. Distinguish
 observations from assumptions and leave missing evidence explicit.
 
-Specifications own the current intended state; task records own planned work,
-progress, and delivery evidence; ADRs own decision rationale and history.
-Link between them. Update only summaries affected by a decision change rather
-than copying the same explanation into every document.
+Specifications own the current intended state and local rationale; task records
+own planned work, progress, delivery evidence, and decisions local to the task.
+ADRs own separately recorded decisions and their history. Link between them.
+Update only summaries affected by a decision change rather than copying the
+same explanation into every document.
 
 ## Preserve decision history
 

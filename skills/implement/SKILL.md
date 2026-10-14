@@ -29,9 +29,9 @@ creating or revising a record; link it from the plan or task record.
 
 ## Implement
 
-Make scoped increments and add or update acceptance and regression checks
-where behavior changes or a concrete gap exists. Establish relevant baseline
-behavior when useful.
+Make scoped increments. Reuse sufficient existing acceptance and regression
+checks; add or update checks only for concrete coverage gaps. Establish relevant
+baseline behavior when useful.
 
 For bug fixes, reproduce the failure through the affected entry point. Form
 a cause hypothesis and check it against observed behavior, traces, or a
