@@ -53,12 +53,9 @@ Leave routine coding decisions to implementation.
 
 ## 3. Size for review
 
-Aim for a few hundred handwritten implementation lines per task. Around
-1,000 implementation lines should normally trigger another split.
-
-Treat these as estimates. Consider the entire review burden: implementation,
-tests, migrations, changed contracts, novelty, risk, and surrounding context.
-Identify generated and mechanical changes separately.
+Consider the entire review burden: implementation, tests, migrations, changed
+contracts, novelty, risk, and surrounding context. Identify generated and
+mechanical changes separately.
 
 Split oversized tasks by coherent behavior or responsibility. Preserve the
 tests and failure handling needed to demonstrate correctness.

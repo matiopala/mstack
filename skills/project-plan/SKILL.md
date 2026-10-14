@@ -33,11 +33,11 @@ investigation needed and the decision its evidence must enable.
 
 ## Gather constraints
 
-Ask for missing user estimates, deadlines, capacity, and other constraints;
-preserve their meaning and stated assumptions. Never generate estimates,
-durations, delivery dates, or a schedule yourself. If the user has none, leave
-them unspecified and continue unless a consequential project decision depends
-on them.
+Ask for missing estimates, deadlines, capacity, or other constraints only when
+needed to decide scope, sequencing, or feasibility. Preserve supplied values
+and their stated assumptions. Never generate estimates, durations, delivery
+dates, or schedules yourself. Leave unavailable values unspecified and identify
+any consequential decision that remains blocked.
 
 Flag conflicts supported by the available scope, dependencies, and constraints.
 Recommend scope cuts or staging options for the user to decide, without offering

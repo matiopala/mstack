@@ -37,10 +37,11 @@ Focus on the questions that matter for this proposal:
   conditions? Check meaningful integration, end-to-end, and regression
   scenarios where relevant; coverage percentages alone prove little.
 
-Use independent reviewers for substantial or risky designs when available
-and useful. Give them the same proposal, goals, and relevant context.
-Reconcile disagreements and verify findings against evidence; reviewer
-agreement is not proof.
+Use an independent reviewer when a concrete design question benefits from
+another perspective and delegation is available and permitted. Add further
+reviewers only for distinct questions. Delegated reviewers must not delegate
+further. Give reviewers the proposal, goals, and relevant context. Reconcile
+findings against evidence; agreement is not proof.
 
 ## Judge the findings
 

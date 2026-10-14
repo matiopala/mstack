@@ -53,11 +53,12 @@ same task record when there is one. `deliver` uses `design-review` and
 `blast-radius` when the change warrants them.
 
 `project-plan` defines the overall project and its milestones before detailed
-design. It covers initial planning, asks me for estimates and deadlines, and
-never proposes its own. A larger project can move from `project-plan` through
-`product-spec` and `tech-spec` where needed, then `decompose` and `deliver`.
-Smaller changes can start with the relevant stage. `plan` defines the
-implementation approach for a particular change.
+design. It covers initial planning and asks for missing estimates, deadlines,
+or capacity only when needed to decide scope, sequencing, or feasibility. It
+never proposes its own estimates or schedules. A larger project can move from
+`project-plan` through `product-spec` and `tech-spec` where needed, then
+`decompose` and `deliver`. Smaller changes can start with the relevant stage.
+`plan` defines the implementation approach for a particular change.
 
 `code-review` checks implemented changes with one reviewer. It accepts
 reproducible manual evidence and does not require rerunning supplied proof.
