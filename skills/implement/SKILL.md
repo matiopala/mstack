@@ -102,10 +102,16 @@ After implementation and initial verification, use
 requirements, comparison base and change scope, relevant decisions, and
 verification evidence. Include uncommitted and new files within that scope.
 
-Prefer one reviewer subagent with fresh context when available and permitted.
-Give it the necessary artifacts rather than the full implementation conversation.
-Otherwise, review in the current session and identify the result as self-review.
-The reviewer reports findings; the implementing agent owns fixes.
+For straightforward, low-risk changes, review in the current session and
+identify the result as self-review. Prefer one reviewer subagent with fresh
+context when the change's risk or complexity benefits from an independent
+perspective and delegation is available and permitted. Honor explicit requests
+for independent review. If delegation is unavailable, self-review and disclose
+any unmet independent-review request.
+
+When delegating, give the reviewer the necessary artifacts rather than the full
+implementation conversation. The reviewer reports findings; the implementing
+agent owns fixes.
 
 Check findings against the code and requirements. Fix confirmed, material
 issues within scope without asking for renewed approval. Explain findings

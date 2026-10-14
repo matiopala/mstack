@@ -11,7 +11,7 @@ https://github.com/mitsuhiko/agent-stuff/blob/main/extensions/review.ts
 The code rubric follows this repo's implement principles.
 -->
 
-Use one reviewer. Delegate when the user or calling workflow authorizes it
+Use one reviewer. Delegate only when the user or calling workflow authorizes it
 and the host permits it. A delegated reviewer performs the review itself
 without spawning another reviewer. Reuse established context and widen
 investigation only for concrete questions or risks.

@@ -44,7 +44,10 @@ still needs appropriate measurements or checks.
 
 Use `implement` for a defined change. It owns implementation, verification,
 code review, and fixes until the final evidence supports completion and no
-material review findings remain.
+material review findings remain. Straightforward, low-risk changes use labeled
+self-review; a fresh reviewer is preferred when risk or complexity warrants one.
+Explicit requests for independent review are honored, with any inability to
+provide it disclosed.
 
 `deliver` ties together `grill-me`, `research`, `plan`, and `implement` when the
 full workflow is wanted. It inherits the implementation review loop rather than
@@ -68,8 +71,9 @@ also requested.
 
 Use `create-verification-skill` to capture how to launch, drive, and verify a
 project in a project-local `verify-<project>` skill and feature map. Use
-`maintain-verification-skill` for an explicit audit of those instructions,
-keeping documentation and harness fixes separate from product regressions.
+`maintain-verification-skill` for drift audits or requested upkeep. Audits report
+findings; maintenance requests also authorize scoped instruction and harness
+repairs. Product regressions are reported separately.
 Neither is a mandatory delivery stage. `research`, `plan`, and `implement`
 reuse an existing project verification skill when relevant; normal delivery
 collects fresh evidence and updates affected recipes within scope, rather than

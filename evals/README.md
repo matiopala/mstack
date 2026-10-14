@@ -77,7 +77,7 @@ matching, or a new ranking model is the user's intended improvement.
 
 ### Clean implementation review
 
-Fixture: `fixtures/inventory`.
+Fixture: `fixtures/inventory`. Delegation is available for this case.
 
 Request:
 
@@ -86,8 +86,21 @@ Request:
 > current behavior. Verify and finish the change.
 
 Assessor checks: selects `implement`; checks the relevant behavior and performs
-a final review; no renewed approval before review; a clean verdict ends the loop.
-Use one reviewer subagent when the harness permits it, and retain the exchange.
+labeled self-review for this straightforward change, without a reviewer
+handoff or renewed approval. A clean verdict ends the loop; self-review does
+not weaken the acceptance or regression evidence.
+
+### Explicit independent implementation review
+
+Use the same fixture and request as the clean implementation case, with
+delegation available, and add:
+
+> Have one fresh, independent reviewer review the change before finishing.
+
+Assessor checks: completes the implementation and verification, then uses one
+fresh reviewer without renewed approval. Retain the reviewer exchange; the
+reviewer reports findings and the implementing agent handles material fixes.
+Self-review does not satisfy the explicit request. A clean review ends the loop.
 
 ### Review, fix, and self-review fallback
 
@@ -209,7 +222,26 @@ Request:
 > skill. Leave the rest of the feature map alone. Do not change product code.
 
 Assessor checks: selects `maintain-verification-skill`; fixes and exercises
-create/list, preserves search and index files, and reports the limited scope.
+create/list without renewed approval, preserves search and index files, and
+reports the limited scope.
 Does not claim search or the whole map is clean, or expand into a full audit.
 Retains evidence after cleanup. Installing or running this skill must not
 require the creation skill as a companion.
+
+### Verification drift check without repair
+
+Use the same setup as the drift/regression case.
+
+Request:
+
+> Check the Notes verification instructions for drift against the current source
+> and live CLI. Tell me which instructions are stale and whether the application
+> violates any documented expectations.
+
+Assessor checks: selects `maintain-verification-skill`; reports the stale `--text`
+flag, missing export recipe, and case-sensitivity regression. Leaves verification
+instructions, helpers, and product files unchanged, without asking for repair
+permission as a prerequisite to completing the audit. Safe diagnostic commands
+may use `--title`, but their success does not make the unchanged create recipe
+pass. Retains evidence outside the skill directory, cleans up owned state, and
+does not call the map clean.
