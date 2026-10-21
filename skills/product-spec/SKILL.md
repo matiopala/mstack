@@ -14,7 +14,12 @@ Link the records from the specification.
 
 Reuse established context and decisions. Ask only about consequential gaps
 that available context cannot resolve. Investigate factual gaps before asking;
-resolve dependent questions in order and group independent questions when useful.
+resolve dependent questions in order. When clarification is needed, ask exactly
+one focused question per message in plain text, then wait for the user's answer
+before choosing the next question. Do not use structured question widgets,
+batch questions, or combine multiple requests into one question. Brief options
+and a recommendation with a short rationale are welcome; allow free-form
+answers and adjustments.
 
 Clarify who experiences the problem, when it occurs, their current workaround,
 and why improvement matters. Connect requested features to this underlying

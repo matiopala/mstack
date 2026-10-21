@@ -20,8 +20,12 @@ Identify the intended outcomes, scope, constraints, acceptance criteria,
 and existing behavior that must remain working.
 
 Reuse settled decisions. Ask only about consequential gaps that available
-context cannot resolve. Resolve dependent questions in order; group independent
-questions when useful.
+context cannot resolve. Resolve dependent questions in order. When clarification
+is needed, ask exactly one focused question per message in plain text, then wait
+for the user's answer before choosing the next question. Do not use structured
+question widgets, batch questions, or combine multiple requests into one
+question. Brief options and a recommendation with a short rationale are welcome;
+allow free-form answers and adjustments.
 
 Distinguish requirements, observed facts, assumptions, and proposed decisions.
 Clarify assumptions that could materially change the solution.

@@ -17,6 +17,13 @@ authorizes moving between stages; do not ask for repeated approval simply
 because a stage ends. A request for only part of the workflow ends at that
 boundary.
 
+For interview and clarification messages throughout the workflow, ask exactly
+one focused question per message in plain text, then wait for the user's answer
+before choosing the next question. Do not use structured question widgets,
+batch questions, or combine multiple requests into one question. Brief options
+and a recommendation with a short rationale are welcome; allow free-form
+answers and adjustments.
+
 ## Task records
 
 Task records are optional. When working from a task file or tracker issue,

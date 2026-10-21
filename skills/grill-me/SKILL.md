@@ -12,10 +12,12 @@ topic, plan, or decision. Examine assumptions and work through consequential
 choices in dependency order, resolving foundational questions before the
 choices that depend on them.
 
-For standalone interviews, ask one focused question at a time and wait for
-the answer before choosing the next. Within `deliver`, group independent
-questions when useful and wait for answers before asking dependent questions.
-Give recommended answers with brief rationales.
+In every interview, including within `deliver`, ask exactly one focused
+question per message in plain text. Wait for the user's answer before choosing
+the next question. Do not use structured question widgets, batch questions,
+or combine multiple requests into one question. Brief options and a
+recommendation with a short rationale are welcome; allow free-form answers
+and adjustments.
 
 Investigate available context, files, code, and other accessible sources before
 asking for facts you can establish yourself. Reuse settled decisions; revisit

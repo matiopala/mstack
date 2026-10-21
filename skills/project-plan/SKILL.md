@@ -23,7 +23,13 @@ asking for facts inspection could establish. Keep investigation focused on
 project planning; leave detailed design to specifications.
 
 Ask only about consequential gaps that available context cannot resolve.
-Resolve dependent questions in order; group independent questions when useful.
+Resolve dependent questions in order. When clarification is needed, ask exactly
+one focused question per message in plain text, then wait for the user's answer
+before choosing the next question. Do not use structured question widgets,
+batch questions, or combine multiple requests into one question. Brief options
+and a recommendation with a short rationale are welcome; allow free-form
+answers and adjustments.
+
 Challenge weak assumptions and recommend concrete scope or staging choices.
 Reuse settled decisions unless new evidence changes their implications.
 
