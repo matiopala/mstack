@@ -23,6 +23,7 @@ with Codex, Pi, and Claude Code.
 | [`decompose`](skills/decompose/SKILL.md) | Split a bigger design into reviewable tasks with clear acceptance criteria and proof of completion. |
 | [`deliver`](skills/deliver/SKILL.md) | Work through questions, research, planning, implementation, verification, and review and fixes. |
 | [`design-review`](skills/design-review/SKILL.md) | Challenge a proposed solution and get concrete findings in plain language. |
+| [`go-deeper`](skills/go-deeper/SKILL.md) | Rewrite a task for greater depth, with primary material, specific methods, and independent evidence, without expanding scope. |
 | [`grill-me`](skills/grill-me/SKILL.md) | Get interviewed about an idea, surface assumptions, and clarify what I actually want. |
 | [`handoff`](skills/handoff/SKILL.md) | Pass the current work to a fresh agent with artifact references, verification status, and an exact next action. |
 | [`implement`](skills/implement/SKILL.md) | Implement a defined change, verify it, and review and fix material issues before delivery. |
