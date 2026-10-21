@@ -17,6 +17,7 @@ with Codex, Pi, and Claude Code.
 | [`adr`](skills/adr/SKILL.md) | Keep track of important decisions, their reasoning, and later changes. |
 | [`blast-radius`](skills/blast-radius/SKILL.md) | Check what a change could break elsewhere, with concrete evidence and a plain-language explanation. |
 | [`bro`](skills/bro/SKILL.md) | Get a simpler version of the previous answer. |
+| [`catch-up`](skills/catch-up/SKILL.md) | Catch up on progress and pending decisions, with enough context to act. |
 | [`code-review`](skills/code-review/SKILL.md) | Review a PR for proof it works, regression risks, and simple, maintainable code. |
 | [`conventional-commits`](skills/conventional-commits/SKILL.md) | Prepare focused Git commits with clear Conventional Commit messages. |
 | [`create-verification-skill`](skills/create-verification-skill/SKILL.md) | Create reusable, project-local instructions for driving the real app and collecting proof. |
@@ -91,6 +92,8 @@ it does not automatically edit skills or project guidance.
 - `blast-radius` is adapted from
   [pstack's blast-radius](https://github.com/cursor/plugins/blob/main/pstack/skills/blast-radius/SKILL.md).
 - `bro` is adapted from [backnotprop/bro](https://github.com/backnotprop/bro).
+- `catch-up` is inspired by
+  [pstack's ketchup](https://github.com/cursor/plugins/blob/main/pstack/skills/ketchup/SKILL.md).
 - `create-verification-skill` and `maintain-verification-skill` are adapted from
   [pstack's creation](https://github.com/cursor/plugins/blob/main/pstack/skills/create-verification-skill/SKILL.md)
   and [maintenance](https://github.com/cursor/plugins/blob/main/pstack/skills/maintain-verification-skill/SKILL.md)
