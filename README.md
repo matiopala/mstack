@@ -98,6 +98,8 @@ it does not automatically edit skills or project guidance.
   [pstack's creation](https://github.com/cursor/plugins/blob/main/pstack/skills/create-verification-skill/SKILL.md)
   and [maintenance](https://github.com/cursor/plugins/blob/main/pstack/skills/maintain-verification-skill/SKILL.md)
   skills, with their MIT license preserved in each skill directory.
+- `go-deeper` draws on the user's prompt and the user-choice guidance in
+  [pstack's sharpen](https://github.com/cursor/plugins/blob/main/pstack/skills/sharpen/SKILL.md).
 - `grill-me` is adapted from
   [Matt Pocock's original skill](https://github.com/mattpocock/skills/blob/a6bdfd9fed6c17d21b306aeb7ff6a0de8b72ef3c/grill-me/SKILL.md).
 - `handoff` is adapted from

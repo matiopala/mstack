@@ -5,6 +5,7 @@ description: Rewrite a task prompt for greater depth without expanding scope. Us
 
 Make the user's task deeper, not bigger. Preserve its goal, scope, and
 constraints.
+Leave choices that belong to the user open instead of deciding them.
 
 Before rewriting, briefly identify:
 1. What a top professional in this field would do here that the prompt
