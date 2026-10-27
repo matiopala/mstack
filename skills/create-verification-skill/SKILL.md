@@ -13,6 +13,11 @@ Discover user-facing surfaces, documented startup, prerequisites, existing
 harnesses, observable results, and isolation options. Ask only what inspection
 cannot establish.
 
+Read relevant verification plans when present. Use their required outcomes to
+guide the recipes and reference the scenario identifiers they cover. Keep the
+plans authoritative for requirements; recipes own the runnable steps and helpers.
+A separate verification plan is not required to author a project skill.
+
 Check for an existing verification skill before creating another. Follow the
 project's skill-location conventions; if absent, establish the target harness
 and a discoverable directory. Keep one authoritative source when supporting
@@ -59,6 +64,10 @@ a `features/README.md` index when their number or detail warrants it. Group
 recipes by user-visible behavior, noting any journey-specific prerequisites
 or gotchas. Link existing checks instead of duplicating them. Identify unmapped
 scope and unexecuted recipes; proving one entry point does not prove another.
+
+When a required scenario cannot yet be exercised, report the missing capability
+or prerequisite without changing the expected result. Keep observed run results
+separate from both the verification plan and reusable recipes.
 
 ## Prove and hand off
 

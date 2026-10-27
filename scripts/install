@@ -60,12 +60,15 @@ fi
 for skill_name in $selected_skills; do
   case "$skill_name" in
     deliver)
-      companion_skills="adr grill-me research plan implement design-review blast-radius code-review"
+      companion_skills="adr grill-me research design-verification plan implement design-review blast-radius code-review"
       ;;
     implement)
       companion_skills="adr code-review"
       ;;
-    project-plan|product-spec|tech-spec|decompose|research|plan)
+    plan|tech-spec|decompose)
+      companion_skills="adr design-verification"
+      ;;
+    project-plan|product-spec|research)
       companion_skills=adr
       ;;
     *) continue ;;

@@ -28,6 +28,12 @@ and existing behavior that must remain working. Read relevant PR or task
 context and accepted decisions. Clarify consequential gaps rather than treating
 the implementation as its own specification.
 
+Read the verification plan when present and use its scenario identifiers to
+assess coverage and evidence. Check that implementation or execution changes
+have not weakened required outcomes. Requirement revisions need a recorded
+reason grounded in the intended behavior. For a small task without a separate
+plan, review against the accepted criteria; a missing document alone is not a defect.
+
 ## Examine the proof first
 
 Require irrefutable proof: reproducible, inspectable evidence that the

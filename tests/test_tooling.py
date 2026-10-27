@@ -42,10 +42,14 @@ class InstallerTests(unittest.TestCase):
             self.assertEqual(link.resolve(), ROOT / "skills" / name)
 
     def test_copied_dependency_blocks_all_writes(self):
-        for skill, dependency in (("deliver", "grill-me"), ("implement", "code-review")):
+        for skill, dependency in (
+            ("deliver", "grill-me"), ("implement", "code-review"),
+            ("deliver", "design-verification"), ("plan", "design-verification"),
+            ("tech-spec", "design-verification"), ("decompose", "design-verification"),
+        ):
             with self.subTest(skill=skill):
-                self.agents = self.root / skill / "agents"
-                self.claude = self.root / skill / "claude"
+                self.agents = self.root / skill / dependency / "agents"
+                self.claude = self.root / skill / dependency / "claude"
                 copied = self.agents / dependency
                 copied.mkdir(parents=True)
                 (copied / "SKILL.md").write_text("Existing user copy\n")
@@ -118,10 +122,13 @@ class InstallerTests(unittest.TestCase):
     def test_workflow_dependencies_are_installed_for_selected_harness(self):
         workflows = {
             "deliver": {"deliver", "grill-me", "research", "plan", "implement",
-                        "design-review", "blast-radius", "code-review", "adr"},
+                        "design-review", "blast-radius", "code-review", "adr",
+                        "design-verification"},
             "implement": {"implement", "code-review", "adr"},
             "research": {"research", "adr"},
-            "plan": {"plan", "adr"},
+            "plan": {"plan", "adr", "design-verification"},
+            "tech-spec": {"tech-spec", "adr", "design-verification"},
+            "decompose": {"decompose", "adr", "design-verification"},
         }
         for skill, expected in workflows.items():
             for harness in ("codex", "pi", "claude"):
@@ -142,7 +149,7 @@ class InstallerTests(unittest.TestCase):
     def test_independent_skills_install_without_companions(self):
         for skill in ("prototype", "session-review", "code-review", "design-review",
                       "blast-radius", "bro", "create-verification-skill",
-                      "maintain-verification-skill"):
+                      "maintain-verification-skill", "design-verification"):
             for harness in ("codex", "pi", "claude"):
                 with self.subTest(skill=skill, harness=harness):
                     self.agents = self.root / skill / harness / "agents"

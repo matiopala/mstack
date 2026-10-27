@@ -24,13 +24,14 @@ with Codex, Pi, and Claude Code.
 | [`decompose`](skills/decompose/SKILL.md) | Split a bigger design into reviewable tasks with clear acceptance criteria and proof of completion. |
 | [`deliver`](skills/deliver/SKILL.md) | Work through questions, research, planning, implementation, verification, and review and fixes. |
 | [`design-review`](skills/design-review/SKILL.md) | Challenge a proposed solution and get concrete findings in plain language. |
+| [`design-verification`](skills/design-verification/SKILL.md) | Define durable verification scenarios and evidence that survive changes to the implementation approach. |
 | [`go-deeper`](skills/go-deeper/SKILL.md) | Rewrite a task for greater depth, with primary material, specific methods, and independent evidence, without expanding scope. |
 | [`grill-me`](skills/grill-me/SKILL.md) | Get interviewed about an idea, surface assumptions, and clarify what I actually want. |
 | [`handoff`](skills/handoff/SKILL.md) | Pass the current work to a fresh agent with artifact references, verification status, and an exact next action. |
 | [`implement`](skills/implement/SKILL.md) | Implement a defined change, verify it, and review and fix material issues before delivery. |
 | [`in-your-own-words`](skills/in-your-own-words/SKILL.md) | Check the agent's understanding of my intent, constraints, and assumptions. |
 | [`maintain-verification-skill`](skills/maintain-verification-skill/SKILL.md) | Check a project's verification instructions against source and live behavior, and fix drift. |
-| [`plan`](skills/plan/SKILL.md) | Define the approach, acceptance checks, and irrefutable proof for a software change. |
+| [`plan`](skills/plan/SKILL.md) | Plan implementation against a separate verification plan, preserving its requirements when the approach changes. |
 | [`product-spec`](skills/product-spec/SKILL.md) | Define the user problem, desired outcome, and what success looks like. |
 | [`project-plan`](skills/project-plan/SKILL.md) | Shape an initial project plan with scope, milestones, dependencies, and the specs needed next. |
 | [`prototype`](skills/prototype/SKILL.md) | Reach a concrete goal through a lightweight working prototype and checks suited to that goal. |
@@ -51,11 +52,11 @@ self-review; a fresh reviewer is preferred when risk or complexity warrants one.
 Explicit requests for independent review are honored, with any inability to
 provide it disclosed.
 
-`deliver` ties together `grill-me`, `research`, `plan`, and `implement` when the
-full workflow is wanted. It inherits the implementation review loop rather than
-adding another. I can also use each stage on its own, and the stages reuse the
-same task record when there is one. `deliver` uses `design-review` and
-`blast-radius` when the change warrants them.
+`deliver` ties together `grill-me`, `research`, `design-verification`, `plan`,
+and `implement` when the full workflow is wanted. It inherits the implementation
+review loop. Each stage also works on its own. A task record holds progress and
+evidence and links the separate verification plan. `deliver` uses `design-review`
+and `blast-radius` when the change warrants them.
 
 `project-plan` defines the overall project and its milestones before detailed
 design. It covers initial planning and asks for missing estimates, deadlines,
@@ -65,6 +66,21 @@ never proposes its own estimates or schedules. A larger project can move from
 `decompose` and `deliver`. Smaller changes can start with the relevant stage.
 `plan` defines the implementation approach for a particular change.
 
+`design-verification` owns the scenarios, required outcomes, regression
+obligations, and evidence in a durable verification plan. `plan`, `tech-spec`,
+and `decompose` reuse it, creating or revising it through `design-verification`
+when missing or materially incomplete. They reference stable scenario IDs and
+assign the work needed to satisfy them. Changing an implementation approach
+preserves the required outcomes; changing a requirement records the reason.
+Execution details may evolve while proving the same behavior.
+
+Verification plans follow the user's destination and project conventions,
+defaulting to `docs/features/<slug>/verification.md`. Chat-only work keeps a
+separately labeled verification plan. `design-review` assesses its adequacy
+and feasibility, while `implement` and `code-review` use it as the acceptance
+reference. Small implementation tasks can still use sufficient accepted
+criteria without requiring a separate document.
+
 `code-review` checks implemented changes with one reviewer. It accepts
 reproducible manual evidence and does not require rerunning supplied proof.
 In the implementation loop, the reviewer reports findings and the implementing
@@ -72,7 +88,10 @@ agent owns fixes. A standalone review leaves code unchanged unless fixes are
 also requested.
 
 Use `create-verification-skill` to capture how to launch, drive, and verify a
-project in a project-local `verify-<project>` skill and feature map. Use
+project in a project-local `verify-<project>` skill and feature map. Recipes
+reference relevant verification scenarios and provide runnable steps and helpers;
+required outcomes remain in the verification plan, and observed results belong
+in run evidence. Use
 `maintain-verification-skill` for drift audits or requested upkeep. Audits report
 findings; maintenance requests also authorize scoped instruction and harness
 repairs. Product regressions are reported separately.
@@ -157,9 +176,11 @@ Or pick individual skills:
 ./scripts/install conventional-commits
 ```
 
-Installing `deliver` includes `grill-me`, `research`, `plan`, and `implement`.
+Installing `deliver` includes `grill-me`, `research`, `design-verification`,
+`plan`, and `implement`.
 It also includes `design-review`, `blast-radius`, and `code-review`.
 Installing `implement` includes `code-review`.
+Installing `plan`, `tech-spec`, or `decompose` includes `design-verification`.
 `research`, `plan`, and `implement`, along with `project-plan`, `product-spec`,
 `tech-spec`, and `decompose`, consult relevant existing decision records and load
 `adr` only when a consequential choice warrants creating or revising one.
@@ -168,10 +189,11 @@ needed. `grill-me` records ADRs only when explicitly requested and does not
 install `adr` automatically; install it separately when needed.
 
 `prototype`, `session-review`, `blast-radius`, `code-review`, `design-review`,
-`create-verification-skill`, and `maintain-verification-skill` have no companion
-dependencies. The verification-authoring skills are installed independently;
-workflow discovery hooks do not add them as companions. Generated project
-verification skills stay in their projects, not this collection.
+`design-verification`, `create-verification-skill`, and
+`maintain-verification-skill` have no companion dependencies.
+`create-verification-skill` and `maintain-verification-skill` are installed
+independently; workflow discovery hooks do not add them as companions.
+Generated project verification skills stay in their projects, not this collection.
 Reviews explain their findings directly in
 plain language; `bro` remains available for standalone simplification requests.
 If you copy workflow folders manually, include their companions too. Rerunning

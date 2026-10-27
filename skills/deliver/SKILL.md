@@ -1,6 +1,6 @@
 ---
 name: deliver
-description: Guide a software change through requirements interviewing, focused research, planning, implementation, verification, and review and fixes. Use when the user requests this development workflow.
+description: Guide a software change through requirements interviewing, research, verification design, implementation planning, implementation, and review and fixes. Use when the user requests this development workflow.
 ---
 
 <!-- Inspired by Matt Pocock's grill-me and HumanLayer's research-plan-implement workflow:
@@ -27,11 +27,11 @@ answers and adjustments.
 ## Task records
 
 Task records are optional. When working from a task file or tracker issue,
-read its brief, status, and relevant linked context. Use it as the single
-authoritative record across stages: preserve the agreed brief and acceptance
-criteria, record consequential revisions, and add findings, plans, progress,
-and evidence in place. Otherwise, work from the available context and follow
-the user's requested output format and project conventions.
+read its brief, status, and relevant linked context. Use it as the progress hub:
+preserve the agreed brief, link the separate verification plan, and keep
+findings, implementation plans, progress, and evidence in place. Record
+consequential revisions without copying verification requirements into competing
+checklists. Otherwise, follow the user's requested format and project conventions.
 
 ## 1. Interview
 
@@ -48,10 +48,17 @@ Use [research](../research/SKILL.md) to investigate the affected behavior,
 constraints, integration points, regression risks, and verification options.
 Reuse findings from the interview.
 
-## 3. Plan
+## 3. Design verification
 
-Use [plan](../plan/SKILL.md) to define the observable final state, smallest
-approach, acceptance checks, regression protection, and irrefutable proof.
+Use [design-verification](../design-verification/SKILL.md) to establish the
+required scenarios, outcomes, regression obligations, and evidence separately
+from implementation choices. Reuse an adequate existing verification plan.
+Carry its reference and scenario identifiers into the following stages.
+
+## 4. Plan implementation
+
+Use [plan](../plan/SKILL.md) to define the smallest approach and the work needed
+to satisfy the verification plan. Preserve its requirements during replanning.
 Resolve consequential uncertainties before implementation.
 
 Use [design-review](../design-review/SKILL.md) before implementation when the
@@ -59,14 +66,14 @@ solution introduces consequential design choices, such as new ownership
 boundaries or shared contracts. Reuse an existing review when its assumptions
 still hold, and address material findings within the authorized scope.
 
-## 4. Implement, verify, and review
+## 5. Implement, verify, and review
 
 Reuse downstream risk analysis from research and planning, including effects
 on shared contracts, persisted data, and lifecycle behavior. Use
 [blast-radius](../blast-radius/SKILL.md) when concrete downstream questions
 remain unresolved or new evidence introduces risks. Carry the assumptions and
-regression checks into the plan and check them against the final code. Keep
-review effort proportional to the change.
+regression obligations into the verification plan and check them against the
+final code. Keep review effort proportional to the change.
 
 Use [implement](../implement/SKILL.md) to make the scoped change, verify it
 against the agreed criteria, and complete its review-and-fix loop. Let that

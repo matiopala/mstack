@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Create an implementation plan for a defined software change, with an observable final state, acceptance scenarios, regression protection, and irrefutable proof. Use when the user wants to plan a change before implementing it.
+description: Create an implementation plan for a defined software change against durable verification requirements. Use when the user wants to plan or replan how a change will be implemented.
 ---
 
 <!-- Extracted from deliver; workflow inspired by HumanLayer:
@@ -27,30 +27,34 @@ rationale are welcome; allow free-form answers and adjustments.
 Consult relevant accepted decision records. Load [adr](../adr/SKILL.md) only
 when a consequential planning choice warrants creating or revising a record.
 
-## Define the approach and proof
+## Establish the verification reference
+
+Read the existing verification plan before choosing the implementation approach.
+Use [design-verification](../design-verification/SKILL.md) when that plan is
+missing or materially incomplete. Reuse adequate plans and their scenario
+identifiers; do not repeat verification design merely because the approach changes.
+
+Keep the verification plan separate from this implementation plan. Existing
+requirements embedded in an older plan can be separated when touched, preserving
+their meaning and identifiers. Link to the authoritative artifact rather than
+maintaining a second acceptance checklist.
+
+## Define the implementation approach
 
 Define the final state in observable terms. Describe the smallest approach
 that achieves it, including consequential interface, data, compatibility,
 and failure-handling decisions. Use phases when they make work easier to
 verify. Leave routine coding details to implementation.
 
-Map each acceptance criterion to a check and the observable evidence needed
-before claiming delivery. Specify the scenario, expected result, prerequisites,
-and commands for existing checks when known. For checks to create, describe
-the scenario and intended entry point; do not invent executable commands.
+Reference verification scenario identifiers and schedule the implementation,
+check creation, prerequisites, and execution needed to satisfy them. Reuse
+existing tests and project recipes. Creating a reusable project verification
+skill or auditing its whole map remains separate work.
 
-Checks must exercise the relevant user or system entry point and establish
-required side effects. Irrefutable proof is reproducible, inspectable evidence
-that the criteria hold under the stated test conditions.
-
-Reuse relevant journeys from an existing project verification skill when
-choosing checks, noting any recipe gaps. Creating a skill or auditing its whole
-map is separate work, not a prerequisite for planning this change.
-
-Include regression checks for affected existing functionality. Favor
-integration and end-to-end tests that exercise meaningful behavior through
-real affected components. Use unit tests where useful; coverage percentage
-is not a delivery criterion.
+When replanning, preserve required outcomes and scenario identifiers. Execution
+details may change while establishing the same requirements. Route material
+verification gaps or requirement revisions through `design-verification`,
+with their reasons; do not redefine success to fit the chosen approach.
 
 Identify consequential uncertainties that must be resolved before
 implementation. Distinguish them from choices that can be made locally while
@@ -58,12 +62,12 @@ implementing, and state what evidence or decision is needed to proceed.
 
 ## Keep one working plan
 
-Keep the plan and acceptance checklist available for tracking work and resuming
-later. When using a task record, add them to that same record in its existing
-location. Preserve the agreed brief, acceptance criteria, progress, and evidence;
-record consequential revisions explicitly.
+Keep the implementation plan and verification reference available for tracking
+work and resuming later. When using a task record, keep implementation progress
+and evidence there and link the separate verification plan. Preserve the agreed
+brief and record consequential revisions explicitly.
 
 A task record is optional. Otherwise, follow the user's requested output format
-and project conventions. Finish with the approach, acceptance checks, and any
+and project conventions. Finish with the approach, verification reference, and any
 unresolved decisions. Continue to implementation only when covered by the
 user's request and existing authorization.

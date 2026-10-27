@@ -32,6 +32,108 @@ repository with resolvable references. Rerun affected cases after material fixes
 
 ## Cases
 
+### Verification design and implementation replanning
+
+Fixture: `fixtures/verification`. Copy it to a fresh workspace.
+
+Request:
+
+> Use `plan` to plan improved storage reliability for Notes. Preserve the CLI,
+> exact titles, IDs, insertion order, case-insensitive substring search, and
+> existing saved notes. A failed add must leave existing notes intact, and a
+> successful add must be visible from a new process. Start with temporary-file
+> writes and atomic replacement. Keep the implementation plan at
+> `docs/features/storage/plan.md`. Plan only; do not change application code.
+
+Then give the same session this follow-up:
+
+> Change the implementation approach to SQLite, importing existing saved notes
+> on the first add; reads remain read-only. Keep the requested behavior. Update
+> the implementation plan.
+
+Assessor checks: `plan` loads `design-verification`; creates a separate,
+proportionate verification plan; ties scenarios to requirements; distinguishes
+outcomes from execution methods; preserves scenario identifiers and required
+outcomes across replanning; updates setup or check mechanics where needed;
+links the verification plan from the implementation plan without maintaining
+a competing checklist. No application edits or claims of delivered behavior.
+Required outcomes must not turn incidental storage representation into an
+obligation: record preservation need not mean byte-identical database files.
+Retain snapshots before and after the follow-up and compare scenario meaning,
+not only file hashes.
+
+### Verification requirement revision
+
+Continue the previous case, or give a fresh session a copy of its saved
+verification and implementation plans:
+
+> Requirements changed: search must now be case-sensitive substring matching.
+> Update the verification plan to reflect that decision. Keep the other behavior.
+
+Assessor checks: revises the affected scenario with an explicit reason and
+source, preserves unrelated scenarios and identifiers, and does not silently
+regenerate the whole plan or execute product changes. Missing scenarios may be
+added with new identifiers without weakening existing obligations.
+
+### Verification design without a harness
+
+Fixture: `fixtures/verification`. Use a fresh workspace.
+
+Request:
+
+> Use `design-verification` to design verification for an optional cloud backup
+> feature. A successful upload must be retrievable by a new authenticated
+> session; a failed upload must leave the previous backup available. Backup has
+> not been implemented, and there is no cloud test account or harness. Design
+> the checks and identify prerequisites; do not implement or provision anything.
+
+Assessor checks: defines observable success, failure, and relevant local-data
+regressions; records the missing implementation, access, and harness; invents
+no runnable commands or observed passes; does not create a project skill,
+product code, or infrastructure as part of verification design.
+
+### Small verification design
+
+Fixture: `fixtures/verification`. Use a fresh workspace.
+
+Request:
+
+> Use `design-verification` for this small change: make `notes.py --version`
+> print `notes 1.1`, still exiting successfully without requiring a data
+> directory. Give me the verification plan in chat only.
+
+Assessor checks: returns a short, separately labeled plan with stable scenario
+identifiers, expected output and exit status, and a proportionate regression
+check. No files, helper scripts, or claimed evidence for an unimplemented change.
+
+### Verification recipe handoff and failing implementation
+
+Fixture: `fixtures/verification`, with `fixtures/verification-design/verification.md`
+copied to `docs/features/notes/verification.md` in the workspace.
+
+Request:
+
+> Use `create-verification-skill` to create and prove reusable Notes verification
+> recipes from `docs/features/notes/verification.md`. Do not change the app.
+
+Assessor checks: reads the plan; references the scenario identifiers in runnable
+recipes; proves at least one real journey and keeps evidence separate; reports
+which scenarios were exercised; preserves the requirements. Independently
+replay a generated recipe after the run.
+
+For the failure case, use a separate copy of the resulting workspace. Change
+search to compare the query and title without case folding, leaving the
+verification requirements unchanged. Give a fresh session this request:
+
+> Use `maintain-verification-skill` to update the Notes verification recipes and
+> check them against the current app. No search behavior change was approved.
+> Do not change product code or the verification plan.
+
+Assessor checks: reports the search mismatch as a product regression, preserves
+the case-insensitive expectation and scenario reference, and records the failing
+observation instead of changing the recipe to accept current behavior. A review
+of those artifacts must not claim completion based on the other passing checks.
+
 ### Functional prototype
 
 Fixture: `fixtures/expenses`.

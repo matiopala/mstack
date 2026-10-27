@@ -11,6 +11,10 @@ https://github.com/cursor/plugins/blob/main/pstack/skills/maintain-verification-
 
 Locate the project verification skill, its inline or linked recipes, and
 owned helpers.
+Read any linked verification plans and preserve their scenario references and
+required outcomes while updating execution details. Report gaps or conflicts
+with those requirements; this workflow does not rewrite the verification plan
+to match current behavior.
 If several targets are plausible, ask which; if none exists, recommend
 `create-verification-skill` instead of inventing a target.
 

@@ -17,11 +17,16 @@ Confirm the outcome, scope, acceptance criteria, and existing behavior that
 must remain working from that context. Settle only missing details needed for
 a correct change; a separate planning document is not required.
 
+Read the verification plan when present and use its scenarios as the acceptance
+reference. For a small task without one, sufficient accepted criteria remain
+usable; a separate document is not a prerequisite for implementation.
+
 When working from a task file or tracker issue, read its brief, status, and
 linked context. Preserve the agreed brief and acceptance criteria. Keep the
-plan, progress, consequential revisions, and verification evidence in that
-same authoritative record. A task record is optional; otherwise, follow the
-user's requested output format and project conventions.
+implementation plan, progress, consequential revisions, and verification evidence
+in that record, linking the separate verification plan rather than copying it.
+A task record is optional; otherwise, follow the user's requested output format
+and project conventions.
 
 Consult relevant accepted decision records before changing code. Load
 [adr](../adr/SKILL.md) only when a consequential choice or deviation warrants
@@ -66,6 +71,10 @@ not a delivery criterion.
 Adapt routine implementation details as needed. If findings change scope,
 acceptance criteria, or consequential design decisions, update the plan
 and resolve the decision with the user. Honor authorization already given.
+Preserve verification scenario identifiers and required outcomes when the
+implementation approach changes. Execution details may be adapted while proving
+the same requirements. Document requirement additions or revisions and their
+reasons in the verification plan; do not silently redefine success.
 
 ## Prove delivery
 
@@ -89,6 +98,8 @@ separately.
 For each acceptance criterion, report the result and supporting evidence:
 the scenario or test, how to reproduce it, and what was observed. Identify
 the code state tested and any relevant environment limitations or mocks.
+Reference verification scenario identifiers when available and keep these
+run-specific results separate from the verification requirements and recipes.
 
 Do not weaken acceptance criteria to make the implementation pass.
 Distinguish verified behavior from assumptions and unverified checks.
@@ -99,8 +110,9 @@ criterion incomplete.
 
 After implementation and initial verification, use
 [code-review](../code-review/SKILL.md) to review the actual changes. Provide the
-requirements, comparison base and change scope, relevant decisions, and
-verification evidence. Include uncommitted and new files within that scope.
+requirements, verification plan when present, comparison base and change scope,
+relevant decisions, and verification evidence. Include uncommitted and new files
+within that scope.
 
 For straightforward, low-risk changes, review in the current session and
 identify the result as self-review. Prefer one reviewer subagent with fresh

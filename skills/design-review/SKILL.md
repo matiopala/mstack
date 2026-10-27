@@ -17,6 +17,12 @@ and relevant accepted decisions. Inspect code, tests, or other evidence around
 specific design assumptions. Ask about missing context only when it could
 materially change the review; otherwise state the uncertainty.
 
+Read the separate verification plan when present and assess the proposal
+against its scenario identifiers. Check whether its scenarios and required
+evidence adequately cover the requirements. Consult existing project verification
+recipes to assess feasibility and identify gaps. Report required revisions
+without changing expectations to fit the proposed solution.
+
 Judge the design at its current stage. Missing detail is a finding only when
 it must be settled now; leave routine implementation choices to delivery.
 

@@ -86,26 +86,18 @@ and link to the records for rationale, alternatives, and consequences.
 Keep decisions not requiring a separate ADR inline without repeating
 requirements or design details.
 
-## 5. Define acceptance and irrefutable proof
+## 5. Connect the design to verification
 
-Connect each required outcome to observable technical behavior and the
-evidence needed to demonstrate it.
+Read the verification plan and map the proposed solution to its scenario
+identifiers. Use [design-verification](../design-verification/SKILL.md) when
+detailed verification design is missing or materially incomplete, including
+newly discovered failure or compatibility obligations.
 
-Require irrefutable proof: reproducible, inspectable evidence that the
-acceptance criteria hold under the stated test conditions.
-
-Define integration and end-to-end scenarios through the affected components,
-including important edge cases and failure paths. Identify existing behavior
-at risk and the regression checks that must protect it.
-
-Use focused unit tests where helpful; coverage percentage is not a delivery
-criterion.
-
-Specify how the assembled capability will be verified. Make relevant test
-conditions, external dependencies, and limitations explicit. Task-level
-verification can be refined during decomposition.
-
-Define required evidence here; record actual results during implementation.
+Keep technical decisions in this specification and reference the separate
+verification plan for required outcomes and evidence. A design revision may
+change execution details without changing those outcomes. Explain and resolve
+requirement revisions rather than quietly accommodating the new design.
+Record actual check results separately during implementation.
 
 ## 6. Check readiness for decomposition
 
@@ -118,7 +110,7 @@ missing evidence or decisions.
 ## Output
 
 Create or update one authoritative specification covering the relevant
-requirements, current state, design, decisions, verification, and remaining
+requirements, current state, design, decisions, verification references, and remaining
 uncertainties described above. Include supporting references.
 
 Follow the user's requested format and destination, then existing repository
