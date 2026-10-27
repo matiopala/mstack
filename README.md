@@ -1,6 +1,6 @@
-# My agent skills
+# mstack
 
-This is my personal collection of agent skills. I develop and maintain this
+mstack is my personal collection of agent skills. I develop and maintain this
 repo on my own, and only add and keep skills I actually use regularly in my
 projects.
 
@@ -140,9 +140,11 @@ it does not automatically edit skills or project guidance.
 
 ## Install
 
-Clone the repository, then run:
+Clone the repository and install the skills:
 
 ```sh
+git clone https://github.com/matiopala/mstack.git
+cd mstack
 ./scripts/install
 ```
 
