@@ -37,3 +37,5 @@ flowchart TD
 Repairs use the remaining execution budget. Code changes require a new candidate
 and fresh verification. Requirement changes return to preparation for approval.
 The dashboard shows progress and evidence; decisions stay in the conversation.
+
+For maintenance details, see [Method controller internals](method-controller.md).

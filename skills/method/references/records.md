@@ -15,34 +15,22 @@ invalid transitions, stale hashes, and missing evidence references through its A
 
 - `start`: `title`, `goal`, absolute `workspace`, explicit Git `target`. Creates a
   dedicated task branch from HEAD, including a clean detached checkout or worktree.
-  Complete Git history is required. Shallow repositories are rejected before task
-  setup changes the workspace or store; obtain the missing history separately.
-  Method never fetches that history automatically. Candidate capture also rejects
-  a workspace that became shallow after startup, including resumed captures.
+  Complete Git history is required at startup and candidate capture, including
+  recovery. Obtain missing history separately; Method does not fetch it.
   A detached start retains its baseline commit and records `original_branch: null`;
   an attached start retains the original branch name. Target must be an existing
-  local or remote branch;
-  the canonical ref is retained. `HEAD`, tags, and revision expressions are rejected.
-  Optional `repository` associates a separate clone
-  with an existing repository ID and requires `instruction` for that association.
-  A clean workspace may start another task after its located task is complete.
-  The locator must identify that workspace and the selected store; the previous
-  task must have no active run or pending operation. Only `locator.json` is
-  replaced, after setup succeeds; previous records and other `.tasks` files remain.
-  A failed final record or locator publication preserves the old locator and leaves
-  the new task in recovery; inspect it explicitly instead of repeating `start`.
-  Startup remains pending until locator publication is durable. The store rejects
-  another start for a workspace with unfinished startup, even without a locator.
-  Use `list` to find the task and explicit `--store`/`--task` arguments to resume it.
-  If initialization stopped after publishing valid task metadata but before its
-  first event, inspection reports recovery without creating any files. Another
-  start remains blocked until explicit `resolve` abandons the incomplete attempt.
-  Resolution retains the metadata and investigation, leaving the workspace and
-  existing locator unchanged; a fresh `start` can then proceed.
-  Existing caches, artifacts, candidates, or malformed/partial published history
-  are not treated as metadata-only initialization.
-  Active, blocked, paused, malformed, or unavailable task locators require
-  reconciliation before reuse.
+  local or remote branch; `HEAD`, tags, and revision expressions are rejected.
+  Optional `repository` associates a clone with an existing repository ID and
+  requires an actual human `instruction`.
+  Reusing a workspace requires its located task to be complete and idle, with no
+  pending operation, and its locator to match the workspace and selected store.
+  Successful setup replaces only `locator.json`; previous records remain.
+  Reconcile other locator states before reuse. After interrupted startup, use
+  `list` and explicit `--store`/`--task` to inspect recovery instead of repeating
+  `start`, even if no locator exists. If valid metadata was published without a
+  first event, use `resolve` to abandon the attempt before starting again. This
+  preserves metadata, the workspace, and any existing locator; it is not a way
+  to discard malformed or partial established history.
 - `list`: all tasks in the store. `status`/`next`: task state, pending action,
   events, artifacts, authorization, candidates, and evidence references.
 - `serve --port 0`: prints a loopback URL; serves until interrupted. Task URL:
@@ -60,13 +48,10 @@ invalid transitions, stale hashes, and missing evidence references through its A
   operation without repeating it. Use `resolution` to clear a resolved blocker.
   A blocked task requires a nonblank resolution before replaying any known pending
   operation. Failed recovery preserves the blocker and existing execution budget.
-  A recorded startup publication checkpoint can finish publishing its locator
-  after checking the workspace, task branch, baseline, ignore entry, and expected
-  previous/current locator. It never repeats branch creation or overwrites an
-  unexpected locator. Earlier or legacy startup operations without this checkpoint
-  still require explicit investigation and resolution.
-  Metadata-only initialization also requires explicit resolution; `resume` records
-  the pending recovery state but does not repeat setup or change the workspace.
+  Known candidate commits and startup publication checkpoints can finish after
+  state checks. Startup recovery does not repeat branch creation or overwrite an
+  unexpected locator. Earlier startup failures, including metadata-only attempts,
+  require investigation and `resolve`; `resume` only records their pending state.
   An active recorded run requires actor/process reconciliation and `run-finish`.
 - `resolve`: for an uncertain operation with no known checkpoint commit, requires
   `instruction`, investigative `resolution`, and `processes_stopped: true`. Preserves
@@ -123,60 +108,37 @@ optional positive integer `rounds`/`minutes` (defaults 3/120). A correction requ
 can supply the instruction. A new authorization explicitly resets its limits;
 resume and repairs do not. Evidence requests preserve the candidate; implementation
 authorization requires a new implementation run/candidate before verification.
-Starting or finishing a correction does not satisfy this requirement: capture its
-candidate first. Interrupted implementation can resume under the same authorization
-and remaining limits. A completed run from an earlier authorization cannot supply
-the new authorization's candidate. Status also checks recorded run/candidate links
-for older tasks whose implementation flag was cleared when a run started.
+Interrupted implementation can resume within the remaining budget. Capture the
+candidate from a completed run under the current authorization before verifying;
+an earlier authorization's run cannot supply it.
 
 `run-start`: `role` (`implementer` or `verifier`), actual fresh agent `actor` ID.
-Use `codex:<agent-id>` or `claude:<agent-id>` for new records, following the host
-handoff in [hosts.md](hosts.md); preserve existing actor values when resuming.
+Format and register actor identities using [hosts.md](hosts.md).
 The returned active run contains its `id`, workspace, and start time. Verifiers
 cannot share an identity with any implementer in this task. Each new verifier run
 also needs an identity unused by earlier verifier runs, including interrupted runs
 and previous authorizations. Existing active runs can still be reconciled normally.
 The controller creates their isolated checkout from the candidate bundle. One run
 is active at a time.
-Verifier checkouts explicitly use the repository's recorded Git object format
-(SHA-1 or SHA-256), regardless of Git's current default. Older records derive it
-from the retained candidate commit, without requiring the original workspace.
 
 Active time is elapsed wall time while a run is active, including setup and tools.
-Verifier admission records its identity, start time, and consumed round before
-bundle validation and checkout. Validation checks the remaining budget, and setup
-Git subprocesses have bounded timeouts and recorded process-group identities.
-An ordinary setup failure or timeout stops/reaps owned commands and records an
-interrupted run; its elapsed time and round remain consumed. A fresh verifier may
-retry within the remaining limits. Abrupt controller interruption instead leaves
-the active run and pending setup operation for explicit process reconciliation.
-If stopping or reaping a setup process fails, its run and pending process identity
-also remain active for reconciliation; the controller does not claim it stopped.
-Timed setup Git commands use a monotonic deadline and an independent monitor that
-stops/reaps their process group even while startup-event recording is delayed.
-File-backed input/output prevents that delay from blocking pipe transfers. A fast
-command keeps its successful result; elapsed setup time still counts against the
-authorization. Recording failure or interruption waits for monitor cleanup before
-returning, retaining recovery state when cleanup cannot be confirmed.
-Finish a run before waiting on a human. An interrupted run remains active until
-reconciled, conservatively consuming time; restarting does not erase usage.
+Verifier setup consumes a round before bundle validation and checkout. An ordinary
+setup failure or timeout stops owned commands and records an interrupted run;
+time and the round remain consumed. A fresh verifier may retry within the limits.
+Abrupt interruption or unconfirmed process cleanup leaves recovery state: reconcile
+the recorded run and processes before continuing. Finish runs before waiting on a
+human; a run still recorded active continues consuming time across restarts.
 
 `command`: `run`, `argv` (array), `safe_to_record: true`, optional timeout seconds.
-Runs in the registered workspace, with a new process group and timeout capped by
-remaining authorization time. One monotonic deadline includes intent recording and
-process setup. The controller rechecks the authorization budget before spawning;
-expiration before spawn records `command-not-started` and returns an error without
-creating a process or leaving an uncertain operation. Once spawned, an owned monitor
-stops/reaps the process group on exit or deadline independently of delayed event
-recording; do not use it to start persistent servers. Records exit code, timeout,
-candidate identity, and up to 10 MiB combined output with a truncation marker. Failed
-command output remains evidence, never a pass by itself. If recording fails after
-process creation, the owned process group is stopped and the child reaped before
-the error propagates; any pending operation still needs reconciliation.
-The monitor is joined on success, failure, and interruption. If cleanup cannot be
-confirmed, the pending process identity and active run remain for reconciliation.
-Nonzero child exits appear in the evidence; controller success means the attempt
-was recorded.
+Runs in the registered workspace. Its timeout includes recording and process setup
+and is capped by remaining authorization time. Expiration before process creation
+records `command-not-started` and returns an error without a pending operation.
+The process group is stopped on command exit or timeout, so do not start persistent
+servers through this command. Records exit code, timeout, candidate identity, and
+up to 10 MiB combined output with a truncation marker. Nonzero exits remain evidence;
+controller success means the attempt was recorded, not that the check passed.
+Recording failures trigger process cleanup; any pending operation still requires
+reconciliation. Unconfirmed cleanup retains the process identity and active run.
 
 `evidence`: `run`, sanitized text `file`, `description` including limitations. Copies
 native tool/browser/manual observations into retained evidence and returns its ID.
@@ -190,8 +152,8 @@ claim universal secret redaction; inspect/sanitize material before importing it.
 Requires a completed implementer run, authorized baseline/previous candidate HEAD,
 and no staged/unstaged/untracked source outside the explicit path enumeration.
 Staged paths outside the enumeration are rejected without discarding them. Paths
-are literal; a directory explicitly includes its descendants. It creates a checkpoint commit with the local
-Git identity, retains a named Git ref, self-contained bundle, and baseline diff.
+are literal; a directory includes its descendants. Creates a checkpoint commit with
+the local Git identity, retaining a named ref, self-contained bundle, and baseline diff.
 It does not execute commit hooks; run project-required checks explicitly. Empty
 checkpoints are permitted for an authorized no-source-change correction.
 
@@ -250,12 +212,9 @@ authority. Each event carries a timestamp, command payload, and changed state fi
 `state.json` is only a rebuildable cache. Submitted documents and run evidence have
 SHA-256 digests. Candidate bundles retain code independently of worktree lifetime.
 
-Atomic writes fsync the file and parent directory. A per-task OS lock rejects
-concurrent writers and releases on process exit. Before Git/process side effects,
-an intent event records the operation. A crash may leave an operation pending;
-status exposes it rather than repeating it. Known candidate commits can be completed
-idempotently after checking branch/index state. Unknown outcomes require inspection
-and explicit resolution. Never reset the workspace during recovery.
+Concurrent writers are rejected. A crash may leave a pending operation; inspect it
+with `status` and follow the `resume`/`resolve` contracts above. Never reset the
+workspace during recovery.
 
 The event log preserves superseded authorizations, reports, rejections, and original
 failures. Dashboard defaults to current records, with older revisions and raw events

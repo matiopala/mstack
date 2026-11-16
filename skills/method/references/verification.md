@@ -1,12 +1,8 @@
 # Independent verification
 
-Follow the active host's handoff in [hosts.md](hosts.md). Launch one fresh verifier
-that has not implemented this task. Give it the approved
-artifacts, exact candidate, baseline diff, retained findings, environment instructions,
-and this role contract. Do not provide implementation chat or ask for agreement with
-the implementer. No further delegation. Register its actual identity with `run-start`;
-Method creates an isolated detached checkout from the retained candidate bundle.
-Send that returned workspace to the registered verifier before it starts work.
+Register a fresh independent verifier using [hosts.md](hosts.md). Include this role
+contract and the baseline-to-candidate diff. Give it artifact-only context, never
+implementation chat or a request to agree with the implementer. No further delegation.
 
 Verify build and instance identity before exercising a long-running app and after
 unexpected failures. Use safe local/test environments and state owned by this run.
@@ -47,6 +43,6 @@ corrections. Present that exact decision and retain the current candidate and re
 An interrupted verifier that has not submitted a report can retry within the
 remaining authorization limits.
 
-Every required automated scenario must pass and blocking findings must be resolved
-before human review. Optional suggestions do not keep the loop alive. Limits span
-all repairs and resumes under the authorization. Stop at the limit and preserve work.
+Human review requires all automated scenarios to pass and no open blocking findings.
+Optional suggestions do not keep the loop alive. Stop at the execution limit and
+preserve work.
