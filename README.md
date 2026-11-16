@@ -53,6 +53,8 @@ does not invoke or change the other workflow skills. Codex and Claude Code use
 the same controller with fresh implementer/verifier agents and manual delivery. It requires
 Python 3.9+ and Git on macOS/Linux, without additional runtime packages.
 
+See [How Method works](docs/method.md) for a workflow diagram and a short explanation.
+
 Method adopts a clean checkout or worktree and creates a task branch. Durable
 records live in `~/.local/share/method/` (override with `METHOD_HOME`), with a
 locally ignored `.tasks/locator.json` connecting the workspace to its task. Its
