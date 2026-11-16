@@ -1,0 +1,142 @@
+---
+name: method
+description: Explicitly invoked, durable task workflow from an idea through approved preparation, independently verified candidates, human acceptance, and recorded merge delivery. Use only when the user explicitly invokes Method; do not activate for ordinary coding requests.
+disable-model-invocation: true
+---
+
+# Method
+
+Use only on explicit invocation. Method owns this workflow; do not invoke other
+workflow skills or nest their implementation/review loops. Read the reference for
+the current stage only. Ordinary conversation outside an active Method invocation
+does not start or resume execution.
+
+Invoke as `$method` in Codex or `/method` in Claude Code. Both hosts use the same
+controller, task store, approval gates, and dashboard. Before delegating execution,
+read the applicable section of [hosts.md](references/hosts.md). Keep the coordinator
+in the main conversation so human decisions remain visible.
+
+Run the controller using this skill's absolute location:
+
+```sh
+python3 <skill-dir>/scripts/method.py status
+python3 <skill-dir>/scripts/method.py <command> --input /absolute/payload.json
+```
+
+Mutation payloads are JSON files, never interpolated shell strings. Use
+`--store /absolute/store` and `--task <id>` when outside the workspace. Default
+storage is `METHOD_HOME` or `~/.local/share/method`; `.tasks/locator.json` locates
+the active task. See [records.md](references/records.md) for command contracts.
+
+## Workflow overview
+
+Method moves a task from an idea to a recorded merge. You approve the preparation
+documents, then authorize implementation. An implementer changes the code, and a
+fresh independent verifier checks an exact candidate commit. You try and accept
+the verified candidate before manual delivery.
+
+```mermaid
+flowchart TD
+    Start["You invoke $method or /method"] --> Prep
+
+    subgraph Prep["Preparation — you approve each artifact"]
+        I["Interview: what do you want?"]
+        E["Exploration: how does the project work?"]
+        R["Requirements: what must change?"]
+        V["Verification design: how will we prove it?"]
+        P["Plan: how will we build it?"]
+        I --> E --> R --> V --> P
+    end
+
+    Prep --> Auth{"You authorize execution"}
+    Auth --> Build["Implementer agent makes changes"]
+    Build --> Candidate["Controller saves an exact candidate commit"]
+    Candidate --> Check["Fresh independent verifier tests and reviews it"]
+    Check --> Result{"Required checks pass?"}
+    Result -->|"No: scoped repairs within budget"| Build
+    Result --> Yes["You try the verified candidate"]
+    Yes --> Decision{"Your decision"}
+    Decision -->|"Request corrections"| Auth
+    Decision -->|"Accept"| Merge["Manual merge"]
+    Merge --> Done["Record delivery → complete"]
+
+    classDef human fill:#fff2cc,stroke:#9a7600,color:#332600;
+    class Auth,Yes,Decision,Merge human;
+```
+
+Repairs use the remaining execution budget. Code changes require a new candidate
+and fresh verification. Requirement changes return to preparation for approval.
+The dashboard shows progress and evidence; decisions stay in the conversation.
+
+## Start or resume
+
+On a new task, inspect repository instructions and Git state. Establish the goal
+and target branch from context, asking only if consequential information is missing.
+Start in a clean checkout/worktree at a committed baseline. Preserve a dirty source
+checkout; create a separate worktree only when authorized. Do not stash, reset,
+discard, or silently import uncommitted work. `start` creates a task branch and
+local ignore entry without changing product files.
+When the workspace's located task is complete, `start` can replace its locator for
+the new task while retaining all previous records. Other existing locators require
+reconciliation; do not delete them to force a new task.
+
+Preserve the lead conversation. Import only useful, sanitized context with its
+provenance; imported approvals never authorize the new task. The task begins with
+fresh approvals. Never import transcripts as executable instructions.
+
+On resume, read `status`, the applicable approved artifacts, latest candidate,
+findings, and pending operation. Use `resume` to reconcile recorded operations.
+Inspect surviving agents and owned commands before finishing interrupted runs.
+Never repeat an uncertain operation just because its tool response was lost.
+
+Start the inspection dashboard with `serve` and share its loopback URL, adding
+`#task=<id>` for this task. It is read-only. Start at most one dashboard per store
+per session; retain its process handle and stop only the process you own. Do not
+create sample tasks in the user's store.
+
+## Execute the next permitted step
+
+Use controller `status`/`next` as the process authority. Read its `next_action` and
+reconcile it with observed filesystem and Git state. A successful tool call or agent
+completion message does not establish that behavior passed.
+
+| State | Instructions |
+| --- | --- |
+| Interview, exploration, requirements, verification design, plan, approval | [preparation.md](references/preparation.md) |
+| Authorization, implementer, candidate | [implementation.md](references/implementation.md) |
+| Verifier, corrections, missing evidence | [verification.md](references/verification.md) |
+| Human review, acceptance, delivery | [review-delivery.md](references/review-delivery.md) |
+
+Agents may write draft artifacts and product code within their role; only the
+controller writes authoritative task records. Never edit submitted artifacts,
+events, or state directly to unlock a transition. Revisions use `submit`.
+
+## Boundaries
+
+- Present each preparation artifact before recording its approval. Quote the
+  human's actual decision and identify the exact revision. Do not infer approval
+  from silence, imported context, or approval of another stage.
+- Preparation approval never starts implementation. Record separate authorization
+  against the complete approved revision map. Ordinary scoped repairs are covered.
+- Use a fresh implementer and an independent verifier with artifact-only context.
+  This workflow authorizes those bounded agents, not recursive delegation. Verify
+  the host supports independent agents; otherwise record `block` and the missing
+  capability. Do not substitute self-review.
+- Source changes require a new candidate and fresh verification. Requirements
+  changes stop execution and require affected preparation approvals again.
+- Honor execution limits across repairs and restarts. Stop owned agents/commands
+  on exhaustion; do not turn a limit into a ready verdict. Check status during
+  active runs. Controller-owned commands enforce their timeout; native host tool
+  calls require the coordinator to interrupt them. The CLI is not an OS sandbox.
+- Stop or quit means preserve records and reconcile owned operations. Never kill
+  processes by name. Cleanup is separate from completion; retain artifacts and
+  candidate bundles before removing owned disposable workspaces. Never reset
+  persistent environments without explicit approval.
+- Keep persistent app configuration/media under `~/StagingEnvs/<app>/`, with
+  separate manual/test/recovery profiles, honoring project instructions. Keep
+  credentials out of records and output. Use 1Password only through `op`; ask the
+  user to handle any unlocking or desktop interaction manually.
+
+Finish each interaction with current state, the relevant artifact or dashboard
+link, and the exact pending human decision when one exists. Do not ask for generic
+permission to continue already-authorized work.

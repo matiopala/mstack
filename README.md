@@ -31,6 +31,7 @@ with Codex, Pi, and Claude Code.
 | [`implement`](skills/implement/SKILL.md) | Implement a defined change, verify it, and review and fix material issues before delivery. |
 | [`in-your-own-words`](skills/in-your-own-words/SKILL.md) | Check the agent's understanding of my intent, constraints, and assumptions. |
 | [`maintain-verification-skill`](skills/maintain-verification-skill/SKILL.md) | Check a project's verification instructions against source and live behavior, and fix drift. |
+| [`method`](skills/method/SKILL.md) | Explicitly start or resume a durable task with approval gates, independent verification, and a local inspection dashboard. |
 | [`plan`](skills/plan/SKILL.md) | Plan implementation against a separate verification plan, preserving its requirements when the approach changes. |
 | [`product-spec`](skills/product-spec/SKILL.md) | Define the user problem, desired outcome, and what success looks like. |
 | [`project-plan`](skills/project-plan/SKILL.md) | Shape an initial project plan with scope, milestones, dependencies, and the specs needed next. |
@@ -44,6 +45,40 @@ Use `prototype` to try an idea or answer a question through working code.
 It iterates toward the goal and checks that outcome, without a mandatory
 code-review loop or general production hardening. A latency or quality goal
 still needs appropriate measurements or checks.
+
+Invoke `$method` in Codex or `/method` in Claude Code for a self-contained, recorded workflow from an idea through
+approved preparation, implementation, independent verification, human acceptance,
+and recorded merge delivery. Method has its own instructions and controller; it
+does not invoke or change the other workflow skills. Codex and Claude Code use
+the same controller with fresh implementer/verifier agents and manual delivery. It requires
+Python 3.9+ and Git on macOS/Linux, without additional runtime packages.
+
+Method adopts a clean checkout or worktree and creates a task branch. Durable
+records live in `~/.local/share/method/` (override with `METHOD_HOME`), with a
+locally ignored `.tasks/locator.json` connecting the workspace to its task. Its
+read-only HTML dashboard shows tasks, approval state, artifact revisions,
+requirements, plans, candidates, evidence, and history. Decisions stay in the
+conversation. To inspect records directly:
+
+```sh
+python3 skills/method/scripts/method.py list
+python3 skills/method/scripts/method.py serve
+```
+
+`serve` prints a loopback URL and runs until interrupted. See Method's
+[command contracts](skills/method/references/records.md) for scripted operations,
+recovery, and the distinction between recorded authorization and authenticated
+human identity. Method is explicit-only in both hosts and installs independently:
+
+```sh
+./scripts/install --harness codex method
+./scripts/install --harness claude method
+```
+
+Claude uses a registration-only subagent handshake, then resumes the returned
+agent identity after Method records the run. See the
+[host handoff instructions](skills/method/references/hosts.md). No Claude settings,
+permission bypasses, additional worktrees, or separate task stores are required.
 
 Use `implement` for a defined change. It owns implementation, verification,
 code review, and fixes until the final evidence supports completion and no

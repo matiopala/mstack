@@ -8,6 +8,8 @@ import sys
 import tempfile
 import unittest
 
+import yaml
+
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -149,7 +151,7 @@ class InstallerTests(unittest.TestCase):
     def test_independent_skills_install_without_companions(self):
         for skill in ("prototype", "session-review", "code-review", "design-review",
                       "blast-radius", "bro", "create-verification-skill",
-                      "maintain-verification-skill", "design-verification"):
+                      "maintain-verification-skill", "design-verification", "method"):
             for harness in ("codex", "pi", "claude"):
                 with self.subTest(skill=skill, harness=harness):
                     self.agents = self.root / skill / harness / "agents"
@@ -180,6 +182,21 @@ class InstallerTests(unittest.TestCase):
                     installed, unused = self.agents, self.claude
                 self.assert_links(installed, {"project-plan", "adr"})
                 self.assertFalse(unused.exists())
+
+    def test_method_installation_preserves_both_explicit_invocation_policies(self):
+        result = self.install("method")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assert_links(self.agents, {"method"})
+        self.assert_links(self.claude, {"method"})
+        frontmatter = (self.claude / "method/SKILL.md").read_text().split("---", 2)[1]
+        claude_policy = yaml.safe_load(frontmatter)
+        self.assertIs(claude_policy["disable-model-invocation"], True)
+        self.assertNotEqual(claude_policy.get("context"), "fork")
+        self.assertIsNot(claude_policy.get("user-invocable"), False)
+        codex_policy = yaml.safe_load((self.agents / "method/agents/openai.yaml").read_text())
+        self.assertIs(codex_policy["policy"]["allow_implicit_invocation"], False)
+        self.assertEqual((self.agents / "method/scripts/method.py").resolve(),
+                         (self.claude / "method/scripts/method.py").resolve())
 
     def test_standalone_interview_has_no_automatic_adr_dependency(self):
         result = self.install("--harness", "claude", "grill-me")

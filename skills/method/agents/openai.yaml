@@ -1,0 +1,6 @@
+interface:
+  display_name: "Method"
+  short_description: "Durable tasks, explicit approvals, verified delivery"
+  default_prompt: "Use $method to start or resume a durable task."
+policy:
+  allow_implicit_invocation: false
