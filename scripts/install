@@ -59,6 +59,9 @@ fi
 # Include each workflow's complete companion set, including indirect dependencies.
 for skill_name in $selected_skills; do
   case "$skill_name" in
+    deep-plan)
+      companion_skills="plan adr design-verification"
+      ;;
     deliver)
       companion_skills="adr grill-me research design-verification plan implement design-review blast-radius code-review"
       ;;

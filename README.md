@@ -22,6 +22,7 @@ with Codex, Pi, and Claude Code.
 | [`conventional-commits`](skills/conventional-commits/SKILL.md) | Prepare focused Git commits with clear Conventional Commit messages. |
 | [`create-verification-skill`](skills/create-verification-skill/SKILL.md) | Create reusable, project-local instructions for driving the real app and collecting proof. |
 | [`decompose`](skills/decompose/SKILL.md) | Split a bigger design into reviewable tasks with clear acceptance criteria and proof of completion. |
+| [`deep-plan`](skills/deep-plan/SKILL.md) | Plan a change whose approach depends on an uncertain assumption, carrying evidence between rounds. |
 | [`deliver`](skills/deliver/SKILL.md) | Work through questions, research, planning, implementation, verification, and review and fixes. |
 | [`design-review`](skills/design-review/SKILL.md) | Challenge a proposed solution and get concrete findings in plain language. |
 | [`design-verification`](skills/design-verification/SKILL.md) | Define durable verification scenarios and evidence that survive changes to the implementation approach. |
@@ -102,6 +103,12 @@ never proposes its own estimates or schedules. A larger project can move from
 `project-plan` through `product-spec` and `tech-spec` where needed, then
 `decompose` and `deliver`. Smaller changes can start with the relevant stage.
 `plan` defines the implementation approach for a particular change.
+
+Use `$deep-plan` on its own when investigating an assumption could change the
+implementation plan. It borrows questions about primary evidence from `go-deeper`
+and uses `plan` for verification design and the final plan. Its Python 3
+helper prepares the brief and sourced findings for a fresh agent when available.
+A run can finish after one round and allows up to three.
 
 `design-verification` owns the scenarios, required outcomes, regression
 obligations, and evidence in a durable verification plan. `plan`, `tech-spec`,
@@ -219,6 +226,7 @@ Installing `deliver` includes `grill-me`, `research`, `design-verification`,
 `plan`, and `implement`.
 It also includes `design-review`, `blast-radius`, and `code-review`.
 Installing `implement` includes `code-review`.
+Installing `deep-plan` includes `plan`, `design-verification`, and `adr`.
 Installing `plan`, `tech-spec`, or `decompose` includes `design-verification`.
 `research`, `plan`, and `implement`, along with `project-plan`, `product-spec`,
 `tech-spec`, and `decompose`, consult relevant existing decision records and load

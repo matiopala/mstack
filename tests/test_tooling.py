@@ -123,6 +123,7 @@ class InstallerTests(unittest.TestCase):
 
     def test_workflow_dependencies_are_installed_for_selected_harness(self):
         workflows = {
+            "deep-plan": {"deep-plan", "plan", "adr", "design-verification"},
             "deliver": {"deliver", "grill-me", "research", "plan", "implement",
                         "design-review", "blast-radius", "code-review", "adr",
                         "design-verification"},

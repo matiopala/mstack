@@ -32,6 +32,24 @@ repository with resolvable references. Rerun affected cases after material fixes
 
 ## Cases
 
+### Deep planning compared with ordinary planning
+
+Use a fresh copy of `fixtures/verification` for each task and skill. Give
+`plan` and `deep-plan` the same request separately, asking for a chat-only plan.
+
+- “Plan the Notes CLI release bump so `notes.py --version` prints `notes 1.1`
+  and still works without a data directory.”
+- “Plan a move from Notes’ current storage to SQLite. I was thinking we could
+  initialize the new store on the first command if that fits the existing CLI
+  contract. Preserve existing users’ notes and observable behavior.”
+
+Compare the approaches and verification scenarios. Check that the small
+change finishes in one round and the migration accounts for read-only commands
+on fresh and legacy data, including evidence of filesystem side effects.
+For `deep-plan`, inspect the helper's actual actions. If it requested another
+round, check the worker's input for the original goal, sourced findings and
+the specific decision to investigate, and check how its answer affected the plan.
+
 ### Verification design and implementation replanning
 
 Fixture: `fixtures/verification`. Copy it to a fresh workspace.
