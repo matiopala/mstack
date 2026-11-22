@@ -7,11 +7,12 @@ repo_root=$(dirname "$script_dir")
 skills_dir="$repo_root/skills"
 agents_skills_dir=${AGENTS_SKILLS_DIR:-"$HOME/.agents/skills"}
 claude_skills_dir=${CLAUDE_SKILLS_DIR:-"$HOME/.claude/skills"}
+antigravity_skills_dir=${ANTIGRAVITY_SKILLS_DIR:-"$HOME/.gemini/config/skills"}
 harness=all
 selected_skills=
 
 usage() {
-  printf '%s\n' "Usage: ./scripts/install [--harness all|codex|pi|claude] [skill ...]"
+  printf '%s\n' "Usage: ./scripts/install [--harness all|codex|pi|claude|antigravity] [skill ...]"
 }
 
 while [ "$#" -gt 0 ]; do
@@ -41,7 +42,10 @@ while [ "$#" -gt 0 ]; do
 done
 
 case "$harness" in
-  all|codex|pi|claude) ;;
+  all) set -- "$agents_skills_dir" "$claude_skills_dir" "$antigravity_skills_dir" ;;
+  codex|pi) set -- "$agents_skills_dir" ;;
+  claude) set -- "$claude_skills_dir" ;;
+  antigravity) set -- "$antigravity_skills_dir" ;;
   *)
     printf 'Unknown harness: %s\n' "$harness" >&2
     usage >&2
@@ -141,18 +145,9 @@ for skill_name in $selected_skills; do
     continue
   fi
 
-  case "$harness" in
-    all)
-      check_target "$source_path" "$agents_skills_dir" || preflight_failed=1
-      check_target "$source_path" "$claude_skills_dir" || preflight_failed=1
-      ;;
-    codex|pi)
-      check_target "$source_path" "$agents_skills_dir" || preflight_failed=1
-      ;;
-    claude)
-      check_target "$source_path" "$claude_skills_dir" || preflight_failed=1
-      ;;
-  esac
+  for target_root in "$@"; do
+    check_target "$source_path" "$target_root" || preflight_failed=1
+  done
 done
 
 if [ "$preflight_failed" -ne 0 ]; then
@@ -163,16 +158,7 @@ fi
 for skill_name in $selected_skills; do
   source_path="$skills_dir/$skill_name"
 
-  case "$harness" in
-    all)
-      link_skill "$source_path" "$agents_skills_dir"
-      link_skill "$source_path" "$claude_skills_dir"
-      ;;
-    codex|pi)
-      link_skill "$source_path" "$agents_skills_dir"
-      ;;
-    claude)
-      link_skill "$source_path" "$claude_skills_dir"
-      ;;
-  esac
+  for target_root in "$@"; do
+    link_skill "$source_path" "$target_root"
+  done
 done

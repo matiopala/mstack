@@ -7,8 +7,8 @@ projects.
 Some skills are copied or adapted from other people's work. `bro` and
 `grill-me` are two examples. Sources are linked in [Credits](#credits).
 
-The skills use the [Agent Skills](https://agentskills.io/) format and work
-with Codex, Pi, and Claude Code.
+The skills use the [Agent Skills](https://agentskills.io/) format. The installer
+supports Codex, Pi, Claude Code, and Google Antigravity.
 
 ## What's here
 
@@ -196,6 +196,10 @@ By default, this creates symbolic links for every skill in:
 
 - `~/.agents/skills` for Codex and Pi
 - `~/.claude/skills` for Claude Code
+- `~/.gemini/config/skills` for Antigravity ([Google's discovery guide](https://antigravity.google/docs/customization-discovery/))
+
+To see the installed skills in Antigravity, open **Customizations → Installed**
+in the app or run `/skills` in the CLI.
 
 The links point to this clone, so edits and pulls update the installed skill
 files too. To update an existing installation:
@@ -214,6 +218,7 @@ To install for just one tool:
 ./scripts/install --harness codex
 ./scripts/install --harness pi
 ./scripts/install --harness claude
+./scripts/install --harness antigravity
 ```
 
 Or pick individual skills:
@@ -252,8 +257,8 @@ installation unchanged. It refuses to replace existing files or links that point
 elsewhere. For a copied skill directory or a link to another clone, move the old entry
 outside the skills directory before reinstalling. Preserve any local edits you
 want to keep.
-Set `AGENTS_SKILLS_DIR` or `CLAUDE_SKILLS_DIR` to override either installation
-directory.
+Use `AGENTS_SKILLS_DIR`, `CLAUDE_SKILLS_DIR`, or `ANTIGRAVITY_SKILLS_DIR` to
+override the corresponding directory for installation and removal.
 
 ## Uninstall
 
@@ -268,7 +273,7 @@ not delete skill contents or unrelated installations.
 
 Each skill lives in `skills/<skill-name>/SKILL.md`. Any supporting scripts,
 references, or assets stay in the same folder. I keep the shared instructions
-compatible with all three tools wherever possible.
+compatible across tools wherever possible.
 
 Set up the validation dependencies once:
 

@@ -21,15 +21,21 @@ class InstallerTests(unittest.TestCase):
         self.root = Path(temporary.name)
         self.agents = self.root / "agents"
         self.claude = self.root / "claude"
+        self.antigravity = self.root / ".gemini/config/skills"
+        self.environment = dict(os.environ, HOME=str(self.root))
+        self.environment.pop("ANTIGRAVITY_SKILLS_DIR", None)
 
     def install(self, *arguments):
-        environment = os.environ.copy()
-        environment.update(
+        return self.run_script("install", *arguments)
+
+    def run_script(self, script, *arguments):
+        environment = dict(
+            self.environment,
             AGENTS_SKILLS_DIR=str(self.agents),
             CLAUDE_SKILLS_DIR=str(self.claude),
         )
         return subprocess.run(
-            [str(ROOT / "scripts/install"), *arguments],
+            [str(ROOT / "scripts" / script), *arguments],
             cwd=ROOT,
             env=environment,
             capture_output=True,
@@ -74,6 +80,19 @@ class InstallerTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertFalse(self.agents.exists())
         self.assertEqual(existing.read_text(), "Keep this file\n")
+
+    def test_antigravity_conflict_blocks_all_harnesses(self):
+        self.antigravity.mkdir(parents=True)
+        copied = self.antigravity / "plan"
+        copied.mkdir()
+
+        result = self.install("deep-plan")
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(str(copied), result.stderr)
+        self.assertEqual(list(self.antigravity.iterdir()), [copied])
+        self.assertFalse(self.agents.exists())
+        self.assertFalse(self.claude.exists())
 
     def test_unrelated_and_dangling_links_are_preserved(self):
         self.claude.mkdir()
@@ -120,6 +139,30 @@ class InstallerTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assert_links(self.agents, expected)
             self.assert_links(self.claude, expected)
+            self.assert_links(self.antigravity, expected)
+
+    def test_antigravity_only_install_and_uninstall_at_custom_path(self):
+        destination = self.root / "custom skills"
+        self.environment["ANTIGRAVITY_SKILLS_DIR"] = str(destination)
+
+        result = self.install("--harness", "antigravity", "deep-plan")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assert_links(destination, {"deep-plan", "plan", "adr", "design-verification"})
+        self.assertFalse(self.agents.exists())
+        self.assertFalse(self.claude.exists())
+        self.assertFalse(self.antigravity.exists())
+
+        copied = destination / "bro"
+        copied.mkdir()
+        unrelated = destination / "grill-me"
+        unrelated.symlink_to(self.root / "other-checkout")
+        result = self.run_script("uninstall")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(set(destination.iterdir()), {copied, unrelated})
+        self.assertTrue(copied.is_dir())
+        self.assertEqual(unrelated.readlink(), self.root / "other-checkout")
 
     def test_workflow_dependencies_are_installed_for_selected_harness(self):
         workflows = {
@@ -205,6 +248,7 @@ class InstallerTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assert_links(self.claude, {"grill-me"})
         self.assertFalse(self.agents.exists())
+        self.assertFalse(self.antigravity.exists())
 
 
 class ValidatorTests(unittest.TestCase):

@@ -7,6 +7,7 @@ repo_root=$(dirname "$script_dir")
 skills_dir="$repo_root/skills"
 agents_skills_dir=${AGENTS_SKILLS_DIR:-"$HOME/.agents/skills"}
 claude_skills_dir=${CLAUDE_SKILLS_DIR:-"$HOME/.claude/skills"}
+antigravity_skills_dir=${ANTIGRAVITY_SKILLS_DIR:-"$HOME/.gemini/config/skills"}
 
 unlink_skill() {
   source_path=$1
@@ -32,4 +33,5 @@ for source_path in "$skills_dir"/*; do
   [ -d "$source_path" ] || continue
   unlink_skill "$source_path" "$agents_skills_dir"
   unlink_skill "$source_path" "$claude_skills_dir"
+  unlink_skill "$source_path" "$antigravity_skills_dir"
 done
