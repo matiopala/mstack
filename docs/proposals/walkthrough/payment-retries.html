@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Payment retries · Walkthrough</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f7f2;
+      --panel: #fffefa;
+      --ink: #202e2c;
+      --muted: #53655f;
+      --line: #ced5cb;
+      --accent: #175d46;
+      --tint: #e6f0e8;
+      --old: #8f422c;
+      --old-tint: #f7eae1;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.55 "Inter", system-ui, sans-serif; }
+    button, input, select { font: inherit; }
+    button, summary, select, input[type="checkbox"] { cursor: pointer; }
+    button, select { color: inherit; }
+    button:focus-visible, select:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px solid #24805b; outline-offset: 3px; }
+    .wrap { width: min(1040px, calc(100% - 48px)); margin: auto; }
+    header { border-bottom: 1px solid var(--line); }
+    .bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-block: 15px; }
+    .brand, nav { display: flex; gap: 12px; align-items: center; }
+    .brand { font-weight: 650; }
+    .brand span { color: var(--muted); font-weight: 450; }
+    nav { background: #e9ece4; border-radius: 8px; padding: 3px; gap: 2px; }
+    nav button { border: 0; padding: 6px 14px; border-radius: 6px; background: transparent; font-size: .88rem; font-weight: 620; }
+    nav button[aria-pressed="true"] { background: var(--ink); color: white; }
+    main { padding-bottom: 42px; }
+    .intro { padding: 30px 0 24px; }
+    .eyebrow { margin: 0; color: var(--muted); font: .78rem/1.5 var(--mono); }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2 { font-family: "STIX Two Text", "Baskervville", Georgia, serif; font-weight: 500; line-height: 1.12; }
+    h1 { font-size: clamp(2.1rem, 4.8vw, 3.75rem); letter-spacing: -.045em; margin: 7px 0 10px; }
+    h2 { font-size: clamp(1.5rem, 3vw, 2.05rem); letter-spacing: -.028em; margin-bottom: 14px; }
+    h3 { font-size: .98rem; }
+    .lede { color: var(--muted); max-width: 75ch; }
+    .section { border-top: 1px solid var(--line); padding: 24px 0; }
+    .controls { display: flex; gap: 14px 28px; align-items: end; flex-wrap: wrap; margin-bottom: 16px; }
+    .select-label { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; min-width: 0; max-width: 100%; font-size: .86rem; font-weight: 620; }
+    select { min-width: 0; max-width: 100%; padding: 7px 28px 7px 9px; background: var(--panel); border: 1px solid #8b9991; border-radius: 5px; }
+    .check { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; }
+    input[type="checkbox"] { width: 1.12rem; height: 1.12rem; margin: 0; accent-color: var(--accent); }
+    .results, .code-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .results.single { grid-template-columns: 1fr; }
+    .card { --tone: var(--accent); --wash: var(--tint); background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--tone); border-radius: 7px; padding: 17px 19px; min-width: 0; }
+    .card.before { --tone: var(--old); --wash: var(--old-tint); }
+    .result-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .metric { font: 600 1.25rem/1.4 "Inter", system-ui, sans-serif; color: var(--tone); }
+    .record { margin: 4px 0 14px; color: var(--muted); font-size: .89rem; }
+    .trace { list-style: none; padding: 0; margin: 0; }
+    .trace li { border-left: 2px solid var(--line); padding: 3px 10px; margin: 7px 0; font-size: .94rem; }
+    .trace li.key { background: var(--wash); border-color: var(--tone); border-radius: 0 4px 4px 0; }
+    .trace b { display: block; font: 600 .75rem/1.6 var(--mono); color: var(--muted); }
+    .link { color: var(--accent); background: none; border: 0; border-bottom: 1px solid currentColor; padding: 0; font-size: .88rem; }
+    .card .link { margin-top: 6px; }
+    .actors { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 10px; }
+    .actors button { width: 100%; text-align: left; border: 1px solid var(--line); border-radius: 6px; padding: 10px 13px; background: var(--panel); }
+    .actors button[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--tint); }
+    .actors strong, .actors small { display: block; }
+    .actors small, .arrow { color: var(--muted); }
+    .owner-detail { margin-top: 12px; max-width: 85ch; }
+    .owner-detail .link { margin-top: 6px; }
+    details { border-bottom: 1px solid var(--line); padding-block: 9px; }
+    details p { max-width: 80ch; }
+    summary { color: var(--accent); font-weight: 600; }
+    details[open] > summary { margin-bottom: 9px; }
+    .note { color: var(--muted); margin-bottom: 8px; }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .91rem; background: var(--panel); }
+    th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+    pre { overflow: auto; padding: 12px; border-radius: 5px; background: #e9ede6; color: #263c34; font: .83rem/1.6 var(--mono); tab-size: 2; }
+    code { font-family: var(--mono); }
+    [hidden] { display: none !important; }
+    .sr { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    @media (max-width: 660px) {
+      .wrap { width: calc(100% - 32px); }
+      .intro { padding: 22px 0; }
+      .results, .code-pair { grid-template-columns: minmax(0, 1fr); }
+      .actors { grid-template-columns: 1fr; gap: 5px; }
+      .actors button { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+      .arrow { display: none; }
+      .section { padding: 18px 0; }
+    }
+  </style>
+</head>
+<body>
+  <header><div class="wrap bar">
+    <div class="brand">Walkthrough <span>/</span> <span>Payments</span></div>
+    <nav aria-label="Walkthrough view">
+      <button id="change-view" aria-pressed="true">Pre-merge</button>
+      <button id="feature-view" aria-pressed="false">Feature</button>
+    </nav>
+  </div></header>
+  <main class="wrap">
+    <div class="intro">
+      <p class="eyebrow">Fictional payment model · runs in this file</p>
+      <h1 id="title">Retrying a payment after a timeout</h1>
+      <p class="lede" id="intro"></p>
+    </div>
+    <noscript>Enable JavaScript to run the example and compare the payment outcomes.</noscript>
+    <div id="sections">
+      <section class="section" id="experiment" aria-labelledby="experiment-heading">
+        <h2 id="experiment-heading">Follow one order</h2>
+        <div class="controls">
+          <label class="select-label" for="scenario">First attempt
+            <select id="scenario">
+              <option value="lost">Charge captured, reply lost</option>
+              <option value="normal">Charge captured, receipt arrives</option>
+              <option value="pending">Reply lost, processor still working</option>
+              <option value="closed">Reply lost, attempt closed without a charge</option>
+            </select>
+          </label>
+          <label class="check"><input id="repeat" type="checkbox" checked> Checkout asks to pay again</label>
+        </div>
+        <div id="results" class="results"></div>
+        <p class="sr" id="announcement" aria-live="polite" aria-atomic="true"></p>
+      </section>
+      <section class="section" id="context" aria-labelledby="context-heading">
+        <h2 id="context-heading">Who owns the decision?</h2>
+        <div class="actors" role="group" aria-label="Inspect a participant">
+          <button data-owner="checkout" aria-pressed="false"><strong>Checkout</strong><small>Requests payment</small></button>
+          <span class="arrow" aria-hidden="true">→</span>
+          <button data-owner="worker" aria-pressed="true"><strong>Payment worker</strong><small>Owns the attempt record</small></button>
+          <span class="arrow" aria-hidden="true">⇄</span>
+          <button data-owner="processor" aria-pressed="false"><strong>Card processor</strong><small>Owns the charge outcome</small></button>
+        </div>
+        <div class="owner-detail">
+          <p id="owner-text" aria-live="polite"></p>
+          <button class="link" id="owner-source"></button>
+        </div>
+        <details id="state-table" hidden>
+          <summary>What can the worker do on a repeat request?</summary>
+          <div class="table-scroll"><table>
+            <thead><tr><th>Worker state</th><th>Original attempt lookup</th><th>Next action</th></tr></thead>
+            <tbody id="rules"></tbody>
+          </table></div>
+        </details>
+      </section>
+    </div>
+    <section class="section" aria-labelledby="evidence-heading">
+      <h2 id="evidence-heading">Inspect the evidence</h2>
+      <p class="note">Changing a control runs the model again. The snippets below are the functions that generated the trace.</p>
+      <details id="classification"><summary>How the worker records a receipt or timeout</summary>
+        <div class="code-pair">
+          <div id="old-source"><h3>Before</h3><pre id="before-code"></pre></div>
+          <div><h3 id="new-source-label">Proposed</h3><pre id="after-code"></pre></div>
+        </div>
+      </details>
+      <details id="decision"><summary>How the worker chooses its next action</summary><pre id="retry-code"></pre></details>
+      <details id="execution"><summary>How checkout and the simulated processor produce this trace</summary><pre id="run-code"></pre></details>
+      <details id="limits"><summary>Would two workers retrying at once be safe?</summary>
+        <p>That remains open. This example runs one worker at a time. It assumes each attempt can be looked up by a reference saved before submission, a closed attempt can never capture later, and a fresh second attempt succeeds immediately. To answer the concurrency question for a real service, inspect how workers claim an order and what the processor guarantees when two requests arrive together.</p>
+      </details>
+    </section>
+  </main>
+  <script>
+    "use strict";
+
+    // The processor's outcome can differ from what the worker learned over the network.
+    const cases = {
+      lost:    { outcome: "captured", reply: "timeout" },
+      normal:  { outcome: "captured", reply: "receipt" },
+      pending: { outcome: "pending",  reply: "timeout" },
+      closed:  { outcome: "closed",   reply: "timeout" }
+    };
+
+    function recordReplyBefore(reply) {
+      if (reply === "receipt") return "paid";
+      return "ready";
+    }
+
+    function recordReplyAfter(reply) {
+      if (reply === "receipt") return "paid";
+      return "checking";
+    }
+
+    function chooseAction(workerState, originalOutcome) {
+      if (workerState === "paid") return "finish";
+      if (workerState === "ready") return "submit";
+      if (originalOutcome === "captured") return "record payment";
+      if (originalOutcome === "closed") return "submit";
+      return "wait";
+    }
+
+    function runOrder(recordReply, first, repeatRequested) {
+      const attempts = new Map([["A1", first.outcome]]);
+      const trace = [];
+      const add = (who, message, kind) => trace.push({ who, message, kind });
+      add("Payment worker", "Saves reference A1 and submits the order to the processor.");
+      add("Card processor", "Records A1 as " + attempts.get("A1") + ".");
+
+      let workerState = recordReply(first.reply);
+      const observation = first.reply === "receipt" ? "Receives a receipt" : "Times out";
+      add("Payment worker", observation + " and marks the order " + workerState + ".", "reply");
+
+      if (repeatRequested) {
+        add("Checkout", "Asks the worker to pay the same order again.");
+        let originalOutcome;
+        if (workerState === "checking") {
+          originalOutcome = attempts.get("A1");
+          add("Payment worker", "Looks up A1. The processor reports " + originalOutcome + ".");
+        }
+        const action = chooseAction(workerState, originalOutcome);
+        switch (action) {
+          case "submit":
+            attempts.set("A2", "captured");
+            workerState = recordReply("receipt");
+            add("Payment worker", "Submits a fresh attempt A2. Its receipt confirms a charge.");
+            break;
+          case "record payment":
+            workerState = "paid";
+            add("Payment worker", "Records the existing charge as paid. Sends no new attempt.");
+            break;
+          case "finish":
+            add("Payment worker", "Returns the recorded payment. Sends no new attempt.");
+            break;
+          case "wait":
+            add("Payment worker", "Keeps the order in checking while A1 can still settle.");
+            break;
+        }
+      }
+      const charges = [...attempts.values()].filter(outcome => outcome === "captured").length;
+      return { charges, attempts: attempts.size, workerState, trace };
+    }
+
+    const owners = {
+      checkout: {
+        text: "Checkout can ask to pay the same order more than once. It sends the request to the worker. The worker decides whether that request creates another processor attempt.",
+        target: "execution", link: "Inspect the repeat request"
+      },
+      worker: {
+        text: "The worker owns the order’s local state and saves the original attempt reference. When checkout asks again, this is where the rule for opening a fresh attempt lives.",
+        target: "decision", link: "Inspect the retry rule"
+      },
+      processor: {
+        text: "Only the processor knows whether A1 captured money. In this example it can report captured, pending, or permanently closed. Those answers determine whether the worker can safely try again.",
+        target: "limits", link: "Inspect the processor assumptions"
+      }
+    };
+    const byId = id => document.getElementById(id);
+    const element = (tag, content, className) => {
+      const node = document.createElement(tag);
+      if (content !== undefined) node.textContent = content;
+      if (className) node.className = className;
+      return node;
+    };
+    let mode;
+    let selectedOwner = "worker";
+
+    function inspect(id) {
+      const disclosure = byId(id);
+      disclosure.open = true;
+      const heading = disclosure.querySelector("summary");
+      heading.focus({ preventScroll: true });
+      heading.scrollIntoView({ block: "start" });
+    }
+
+    function chargeLabel(count) {
+      return count + (count === 1 ? " charge" : " charges");
+    }
+
+    function resultCard(label, result, before, highlightReply) {
+      const card = element("article", undefined, before ? "card before" : "card");
+      const header = element("div", undefined, "result-head");
+      header.append(element("h3", label), element("span", chargeLabel(result.charges), "metric"));
+      const count = result.attempts + (result.attempts === 1 ? " attempt" : " attempts");
+      const record = element("p", count + " sent · Worker state " + result.workerState, "record");
+      const trace = element("ol", undefined, "trace");
+      for (const event of result.trace) {
+        const step = element("li");
+        if (highlightReply && event.kind === "reply") step.classList.add("key");
+        step.append(element("b", event.who), document.createTextNode(event.message));
+        trace.append(step);
+      }
+      const source = element("button", "Inspect the receipt rule", "link");
+      source.addEventListener("click", () => inspect("classification"));
+      card.append(header, record, trace, source);
+      return card;
+    }
+
+    function renderResults() {
+      const first = cases[byId("scenario").value];
+      const repeat = byId("repeat").checked;
+      const current = runOrder(recordReplyAfter, first, repeat);
+      const results = byId("results");
+      results.replaceChildren();
+      results.classList.toggle("single", mode === "feature");
+      const highlightReply = recordReplyBefore(first.reply) !== recordReplyAfter(first.reply);
+      let announcement = "";
+      if (mode === "change") {
+        const previous = runOrder(recordReplyBefore, first, repeat);
+        results.append(resultCard("Before", previous, true, highlightReply));
+        announcement = "Before, " + chargeLabel(previous.charges) + ". Proposed, ";
+      }
+      results.append(resultCard(mode === "change" ? "Proposed" : "Payment outcome", current, false, highlightReply));
+      byId("announcement").textContent = announcement + chargeLabel(current.charges) + ". Worker state " + current.workerState + ".";
+    }
+
+    function selectOwner(owner) {
+      selectedOwner = owner;
+      document.querySelectorAll("[data-owner]").forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.owner === owner));
+      });
+      byId("owner-text").textContent = owners[owner].text;
+      byId("owner-source").textContent = owners[owner].link;
+    }
+
+    function renderMode() {
+      mode = location.hash === "#feature" ? "feature" : "change";
+      const isChange = mode === "change";
+      byId("change-view").setAttribute("aria-pressed", String(isChange));
+      byId("feature-view").setAttribute("aria-pressed", String(!isChange));
+      byId("title").textContent = isChange ? "Retrying a payment after a timeout" : "How does checkout know an order is paid?";
+      byId("intro").textContent = isChange
+        ? "A lost reply can hide a successful charge. The proposed change keeps the order open for checking before the worker may submit a second attempt."
+        : "Checkout requests payment, the worker remembers the attempt, and the processor knows whether money moved. Explore what the worker can do when their views differ.";
+      byId("old-source").hidden = !isChange;
+      byId("new-source-label").textContent = isChange ? "Proposed" : "Current behavior";
+      byId("state-table").hidden = isChange;
+      byId("sections").prepend(byId(isChange ? "experiment" : "context"));
+      renderResults();
+    }
+
+    for (const [prefix, fn] of [["before", recordReplyBefore], ["after", recordReplyAfter], ["retry", chooseAction], ["run", runOrder]]) {
+      byId(prefix + "-code").textContent = fn.toString();
+    }
+    const checks = [["paid"], ["ready"], ["checking", "captured"], ["checking", "pending"], ["checking", "closed"]];
+    for (const [state, outcome] of checks) {
+      const row = element("tr");
+      row.append(element("td", state), element("td", outcome ?? "No lookup"), element("td", chooseAction(state, outcome)));
+      byId("rules").append(row);
+    }
+    for (const button of document.querySelectorAll("[data-owner]")) {
+      button.addEventListener("click", () => selectOwner(button.dataset.owner));
+    }
+    byId("owner-source").addEventListener("click", () => inspect(owners[selectedOwner].target));
+    byId("scenario").addEventListener("change", renderResults);
+    byId("repeat").addEventListener("change", renderResults);
+    byId("feature-view").addEventListener("click", () => { location.hash = "feature"; });
+    byId("change-view").addEventListener("click", () => { location.hash = "change"; });
+    window.addEventListener("hashchange", renderMode);
+    selectOwner(selectedOwner);
+    renderMode();
+  </script>
+</body>
+</html>
