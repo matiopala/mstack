@@ -91,10 +91,12 @@ Explicit requests for independent review are honored, with any inability to
 provide it disclosed.
 
 `deliver` ties together `grill-me`, `research`, `design-verification`, `plan`,
-and `implement` when the full workflow is wanted. It inherits the implementation
-review loop. Each stage also works on its own. A task record holds progress and
-evidence with links to the acceptance criteria and tests. `deliver` uses `design-review`
-and `blast-radius` when the change warrants them.
+and `implement` when the full workflow is wanted. It pauses for your approval
+of the verification design and plan before writing tests or product code. It
+inherits the implementation review loop. Each stage also works on its own. A
+task record holds progress and evidence with links to the acceptance criteria
+and tests. `deliver` uses `design-review` and `blast-radius` when the change
+warrants them.
 
 `project-plan` defines the overall project and its milestones before detailed
 design. It covers initial planning and asks for missing estimates, deadlines,

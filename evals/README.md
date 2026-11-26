@@ -60,7 +60,9 @@ Seed and commit a case-sensitive search by replacing
 > Use deliver. Notes search sometimes misses saved titles when I type part of
 > the title in a different case. Fix it. Leave other Notes behavior alone.
 
-Inspect the order of edits and runs. The repo test must exercise the CLI and
+At the approval pause, confirm the agent presented the verification design and
+plan before editing tests or product code. Approve implementation, then inspect
+the order of edits and runs. The repo test must exercise the CLI and
 fail for the reported mismatch before the product edit. Capture the command.
 In a separate checkout, run the delivered test on the original CLI and the
 fixed CLI, preserving identical test bytes. Record the submitted changes in a

@@ -12,10 +12,8 @@ Follow the stages covered by the user's request and existing authorization.
 Resume from established decisions and completed work.
 
 Read and apply each stage's skill when entering it. Carry findings, decisions,
-and the working record forward. An end-to-end delivery request already
-authorizes moving between stages; do not ask for repeated approval simply
-because a stage ends. A request for only part of the workflow ends at that
-boundary.
+and the working record forward. A request for only part of the workflow ends
+at that boundary.
 
 For interview and clarification messages throughout the workflow, ask exactly
 one focused question per message in plain text, then wait for the user's answer
@@ -67,12 +65,16 @@ solution introduces consequential design choices, such as new ownership
 boundaries or shared contracts. Reuse an existing review when its assumptions
 still hold, and address material findings within the authorized scope.
 
+Before entering the test baseline, present the verification design and
+implementation plan together. Ask for explicit approval to begin implementation
+and wait for the user's reply, even on an end-to-end delivery request. If the
+user requests changes, present the revisions for approval.
+
 ## 5. Establish the test baseline
 
-Enter [implement](../implement/SKILL.md) once implementation is authorized.
+After approval, enter [implement](../implement/SKILL.md).
 Write or select the repository tests and run them on the unchanged product.
 Carry the observed failures, characterization passes, and environment gaps forward.
-An end-to-end delivery request covers this step.
 
 ## 6. Implement, verify, and review
 
