@@ -383,6 +383,7 @@ class MethodTests(unittest.TestCase):
         original = json.loads(metadata)
         malformed = [
             {"id": "wrong-task"}, {"baseline": "not-a-commit"}, {"target_at_start": "not-a-commit"},
+            {"branch": "unrelated"}, {"branch": "main"},
             {"skill_sha256": "not-a-sha256"}, {"delivery_requirement": "push"}, {"original_branch": []},
             {"original_branch": "bad branch"}, {"original_branch": "HEAD"}, {"object_format": "invalid"},
             {"object_format": "sha256" if original.get("object_format") == "sha1" else "sha1"}, {"target_ref": "refs/tags/main"}, {"target_ref": "refs/heads/other"},
@@ -2096,6 +2097,55 @@ class MethodTests(unittest.TestCase):
         git(self.repo, "worktree", "add", "-b", "linked", str(worktree), "main")
         view = self.store.start({"workspace":str(worktree), "target":"main", "title":"Linked task"})
         self.assertEqual(view["task"]["repository"]["id"], self.task.view()["task"]["repository"]["id"])
+        self.assertEqual(view["task"]["branch"], "linked")
+        self.assertEqual(git(worktree, "branch", "--show-current"), "linked")
+        self.assertEqual(git(worktree, "branch", "--list", "method/" + view["id"]), "")
+
+    def test_start_reuses_a_branch_behind_target_for_candidate_commits(self):
+        source = self.repo
+        self.repo = self.root / "topic-worktree"
+        branch = "feature/greeting"
+        git(source, "worktree", "add", "-b", branch, str(self.repo), "main")
+        baseline = git(self.repo, "rev-parse", "HEAD")
+        git(source, "tag", branch, baseline)
+        target = self.root / "target-worktree"
+        git(source, "worktree", "add", str(target), "main")
+        git(target, "commit", "--allow-empty", "-m", "Advance the target")
+        target_tip = git(target, "rev-parse", "HEAD")
+
+        view = self.store.start({"workspace": str(self.repo), "target": "main", "title": "Use topic branch"})
+        self.assertEqual(view["task"]["branch"], branch)
+        self.assertEqual(view["task"]["original_branch"], branch)
+        self.assertEqual(view["task"]["baseline"], baseline)
+        self.assertEqual(git(self.repo, "rev-parse", "HEAD"), baseline)
+        self.task = self.store.task(view["id"])
+        self.prepare()
+        self.authorize()
+        candidate = self.implementation()
+        self.assertEqual(git(self.repo, "rev-parse", "refs/heads/" + branch), candidate["commit"])
+        self.assertEqual(git(target, "rev-parse", "HEAD"), target_tip)
+
+    def test_start_creates_a_task_branch_on_main_master_target_or_unmerged_work(self):
+        baseline = git(self.repo, "rev-parse", "main")
+        git(self.repo, "remote", "add", "team/origin", self.repo.as_uri())
+        remote_target = "refs/remotes/team/origin/releases/stable"
+        git(self.repo, "update-ref", remote_target, baseline)
+        git(self.repo, "symbolic-ref", "refs/heads/release-alias", "refs/heads/release")
+        for branch, target in (("main", remote_target), ("master", "main"),
+                               ("staging", "refs/heads/staging"), ("releases/stable", remote_target),
+                               ("release", "release-alias"), ("topic/ahead", "main"),
+                               ("topic/diverged", "topic/ahead")):
+            with self.subTest(branch=branch, target=target):
+                workspace = self.root / branch.replace("/", "-")
+                git(self.repo, "update-ref", "refs/heads/" + branch, baseline)
+                git(self.repo, "worktree", "add", str(workspace), branch)
+                if branch.startswith("topic/"):
+                    git(workspace, "commit", "--allow-empty", "-m", "Existing commit on " + branch)
+                head = git(workspace, "rev-parse", "HEAD")
+                view = self.store.start({"workspace": str(workspace), "target": target, "title": "Separate branch"})
+                self.assertEqual(git(workspace, "branch", "--show-current"), "method/" + view["id"])
+                self.assertEqual(view["task"]["baseline"], head)
+                self.assertEqual(git(workspace, "rev-parse", "refs/heads/" + branch), head)
 
     def test_start_accepts_clean_detached_checkouts_and_worktrees(self):
         original_branch = git(self.repo, "symbolic-ref", "--short", "HEAD")

@@ -13,8 +13,11 @@ invalid transitions, stale hashes, and missing evidence references through its A
 
 ## Discovery and lifecycle
 
-- `start`: `title`, `goal`, absolute `workspace`, explicit Git `target`. Creates a
-  dedicated task branch from HEAD, including a clean detached checkout or worktree.
+- `start`: `title`, `goal`, absolute `workspace`, explicit Git `target`. Reuses a
+  checked-out branch whose tip equals or is an ancestor of the target, except
+  for `main`, `master`, and the target branch itself. A behind branch keeps its
+  current tip as the baseline. Other starts create a task branch from HEAD,
+  including when HEAD is detached.
   Complete Git history is required at startup and candidate capture, including
   recovery. Obtain missing history separately; Method does not fetch it.
   A detached start retains its baseline commit and records `original_branch: null`;

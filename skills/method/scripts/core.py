@@ -191,6 +191,17 @@ def target_ref(workspace, target):
     return matches[0]
 
 
+def target_branch_name(workspace, canonical_target):
+    ref = git(workspace, "rev-parse", "--symbolic-full-name", canonical_target)
+    if ref.startswith("refs/heads/"):
+        return ref.removeprefix("refs/heads/")
+    tracking = ref.removeprefix("refs/remotes/")
+    remotes = git(workspace, "remote").splitlines()
+    remote = max((name for name in remotes if tracking.startswith(name + "/")),
+                 key=len, default=tracking.partition("/")[0])
+    return tracking.removeprefix(remote + "/")
+
+
 def clean(workspace):
     return not git(workspace, "status", "--porcelain", "--untracked-files=all")
 
@@ -276,7 +287,10 @@ class Store:
         canonical_target = target_ref(workspace, target)
         target_sha = git(workspace, "rev-parse", "--verify", canonical_target + "^{commit}")
         baseline = git(workspace, "rev-parse", "HEAD")
-        branch = git(workspace, "rev-parse", "--abbrev-ref", "HEAD")
+        branch = git(workspace, "branch", "--show-current")
+        reuse_branch = (branch not in ("", "main", "master")
+                        and branch != target_branch_name(workspace, canonical_target)
+                        and not git(workspace, "rev-list", "-1", f"{target_sha}..{baseline}"))
         common = Path(git(workspace, "rev-parse", "--path-format=absolute", "--git-common-dir")).resolve()
         with lock(self.root / "registry.lock"), contextlib.ExitStack() as locks:
             for path in (self.root / "tasks").glob("*/task.json"):
@@ -332,17 +346,18 @@ class Store:
             task = self.task(task_id)
             task.path.mkdir(parents=True)
             locks.enter_context(lock(task.path / "task.lock"))
-            task_branch = "method/" + task_id
+            task_branch = branch if reuse_branch else "method/" + task_id
             metadata = {"id": task_id, "title": title, "goal": data.get("goal", title),
                         "repository": repo, "workspace": str(workspace), "baseline": baseline,
                         "object_format": git(workspace, "rev-parse", "--show-object-format"),
                         "target": target, "target_ref": canonical_target, "target_at_start": target_sha, "branch": task_branch,
-                        "original_branch": None if branch == "HEAD" else branch, "created": now(), "method_version": VERSION, "skill_sha256": skill_digest(),
+                        "original_branch": branch or None, "created": now(), "method_version": VERSION, "skill_sha256": skill_digest(),
                         "delivery_requirement": "merge"}
             atomic(task.path / "task.json", encoded(metadata))
             state = initial_state(metadata)
             task.record("start-intent", data, state)
-            git(workspace, "switch", "-c", task_branch)
+            if not reuse_branch:
+                git(workspace, "switch", "-c", task_branch)
             exclude = common / "info" / "exclude"
             old = exclude.read_text() if exclude.exists() else ""
             if "/.tasks/" not in old.splitlines():
@@ -407,7 +422,6 @@ class Task:
         require(metadata["id"] == self.path.name and ID.fullmatch(metadata["id"])
                 and Path(metadata["workspace"]).is_absolute()
                 and re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", metadata["baseline"])
-                and metadata["branch"] == "method/" + metadata["id"]
                 and isinstance(repository, dict)
                 and all(isinstance(repository.get(key), str) and repository[key] for key in ("id", "name"))
                 and isinstance(repository.get("common_dirs"), list)
@@ -432,6 +446,9 @@ class Task:
                 and not metadata["target"].startswith("-")
                 and any(valid_target(ref) for ref in targets)
                 and ("target_ref" not in metadata or metadata["target_ref"] in targets and valid_target(metadata["target_ref"]))
+                and (metadata["branch"] == "method/" + metadata["id"] or metadata["branch"] == original_branch
+                     and original_branch not in ("main", "master") and "target_ref" in metadata
+                     and metadata["target_ref"] != "refs/heads/" + original_branch)
                 and (original_branch is None or isinstance(original_branch, str)
                      and original_branch != "HEAD" and not original_branch.startswith("-")
                      and subprocess.run(["git", "check-ref-format", "refs/heads/" + original_branch],
@@ -624,7 +641,7 @@ class Task:
 
     def assert_workspace(self, state, expected=None):
         workspace = state["task"]["workspace"]
-        require(git(workspace, "symbolic-ref", "--short", "HEAD") == state["task"]["branch"], "Task branch changed")
+        require(git(workspace, "branch", "--show-current") == state["task"]["branch"], "Task branch changed")
         if expected:
             require(git(workspace, "rev-parse", "HEAD") == expected, "Workspace HEAD changed; reconcile before proceeding")
         return workspace

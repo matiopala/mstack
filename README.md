@@ -56,7 +56,8 @@ Python 3.9+ and Git on macOS/Linux, without additional runtime packages.
 
 See [How Method works](docs/method.md) for a workflow diagram and a short explanation.
 
-Method adopts a clean checkout or worktree and creates a task branch. Durable
+Method adopts a clean checkout or worktree and reuses an eligible branch.
+Otherwise it creates a task branch. Durable
 records live in `~/.local/share/method/` (override with `METHOD_HOME`), with a
 locally ignored `.tasks/locator.json` connecting the workspace to its task. Its
 read-only HTML dashboard shows tasks, approval state, artifact revisions,

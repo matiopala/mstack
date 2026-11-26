@@ -30,8 +30,10 @@ On a new task, inspect repository instructions and Git state. Establish the goal
 and target branch from context, asking only if consequential information is missing.
 Start in a clean checkout/worktree at a committed baseline. Preserve a dirty source
 checkout; create a separate worktree only when authorized. Do not stash, reset,
-discard, or silently import uncommitted work. `start` creates a task branch and
-local ignore entry without changing product files.
+discard, or silently import uncommitted work. `start` reuses the checked-out
+branch at its current commit if it has no commits beyond the target and is
+different from `main`, `master`, and the target branch. Otherwise it creates a
+task branch from HEAD. It adds a local ignore entry for the task locator.
 When the workspace's located task is complete, `start` can replace its locator for
 the new task while retaining all previous records. Other existing locators require
 reconciliation; do not delete them to force a new task.
