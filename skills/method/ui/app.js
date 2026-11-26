@@ -165,6 +165,13 @@ async function artifactView(task, section) {
       for(const scenario of scenarios) {
         const result=report?.results.find(r=>r.id===scenario.id);
         block.append(el("p", {},el("code", {},scenario.id)," ",badge(result?.outcome||"unverified")," ",result?.observed||scenario.text));
+        const revision=section==="verification"?selected:verification;
+        const baseline=(current?candidate.test_baselines:task.state.test_baselines)?.[scenario.id];
+        if(baseline?.binding && baseline.revision===revision?.sha256 && latest && isApproved) {
+          block.append(el("p", {},el("code", {},baseline.binding.selector)," · Baseline ",baseline.outcome,
+            baseline.unavailable?" · "+baseline.unavailable:""));
+          if(baseline.evidence) block.append(el("button", {class:"evidence-link",onclick:()=>showEvidence(task.id,baseline.evidence)},"View baseline run"));
+        }
         for(const id of result?.evidence||[]) block.append(el("button", {class:"evidence-link",onclick:()=>showEvidence(task.id,id)},"View evidence "+id.slice(0,6)));
       }
       if(!scenarios.length) block.append(el("small", {},"Verification scenarios not yet submitted."));

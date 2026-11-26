@@ -9,19 +9,20 @@ unexpected failures. Use safe local/test environments and state owned by this ru
 Follow project instructions for persistent staging profiles; never reset persistent
 state without explicit approval. Record relevant external versions, mocks, and limits.
 
-Execute required automated scenarios through real entry points. Capture actions,
-commands, expected and observed results, side effects, and failure diagnostics.
-Inspect what tests actually establish. Green output, a plan, and an implementer's
-completion message are insufficient proof. A manual observation can be evidence,
-but scenarios explicitly requiring human judgment remain for the human reviewer.
+Inspect the checkpointed test and its dependencies against the requirement.
+Use `test` on the clean candidate for each automated scenario. Method reruns the
+bound command and records the selected case's outcome. Examine failures and
+side effects. An unavailable environment, skipped case, or empty selection
+leaves the scenario unverified. Compare baseline and candidate evidence and
+surface baseline gaps to the reviewer. Human judgments remain for the human reviewer.
 
 Review the baseline-to-candidate diff for concrete correctness, regression, and
 material maintainability defects. Trace affected callers and contracts before
 asserting impact. Check hidden failures, ignored exceptions, and fallbacks that mask
 errors. Separate blocking findings from optional style suggestions.
 
-Use `command` to retain safe command output, or `evidence` to import sanitized native
-tool observations. Every pass/fail references evidence IDs from this run. Report
+Use `command` or `evidence` for supplementary diagnostics and observations. An
+automated pass/fail must reference the latest `test` result for that scenario. Report
 every approved scenario as `pass`, `fail`, `unverified`, or (only for human scenarios)
 `human_pending`. Missing required evidence blocks readiness.
 

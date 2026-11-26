@@ -66,13 +66,13 @@ boundaries.
 
 ## 4. Assign verification responsibilities
 
-Reuse the verification plan. Use
+Reuse accepted criteria, tests, and any existing verification plan. Use
 [design-verification](../design-verification/SKILL.md) when detailed verification
 design is missing or materially incomplete. Reference its scenario identifiers
 in task briefs and assign ownership of the checks, prerequisites, and execution
 needed to establish them, including verification of the assembled behavior.
 
-Keep required outcomes in that separate plan as task boundaries change. Add
+Preserve those outcomes as task boundaries change. Add
 necessary intermediate-state scenarios through verification design; do not
 weaken expectations or duplicate the full plan in each task. An investigation
 still needs evidence supporting its conclusion, and a migration needs evidence

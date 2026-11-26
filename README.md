@@ -25,7 +25,7 @@ supports Codex, Pi, Claude Code, and Google Antigravity.
 | [`deep-plan`](skills/deep-plan/SKILL.md) | Plan a change whose approach depends on an uncertain assumption, carrying evidence between rounds. |
 | [`deliver`](skills/deliver/SKILL.md) | Work through questions, research, planning, implementation, verification, and review and fixes. |
 | [`design-review`](skills/design-review/SKILL.md) | Challenge a proposed solution and get concrete findings in plain language. |
-| [`design-verification`](skills/design-verification/SKILL.md) | Define durable verification scenarios and evidence that survive changes to the implementation approach. |
+| [`design-verification`](skills/design-verification/SKILL.md) | Design acceptance tests and identify missing assertions or human judgments. |
 | [`go-deeper`](skills/go-deeper/SKILL.md) | Rewrite a task for greater depth, with primary material, specific methods, and independent evidence, without expanding scope. |
 | [`grill-me`](skills/grill-me/SKILL.md) | Get interviewed about an idea, surface assumptions, and clarify what I actually want. |
 | [`handoff`](skills/handoff/SKILL.md) | Pass the current work to a fresh agent with artifact references, verification status, and an exact next action. |
@@ -33,7 +33,7 @@ supports Codex, Pi, Claude Code, and Google Antigravity.
 | [`in-your-own-words`](skills/in-your-own-words/SKILL.md) | Check the agent's understanding of my intent, constraints, and assumptions. |
 | [`maintain-verification-skill`](skills/maintain-verification-skill/SKILL.md) | Check a project's verification instructions against source and live behavior, and fix drift. |
 | [`method`](skills/method/SKILL.md) | Explicitly start or resume a durable task with approval gates, independent verification, and a local inspection dashboard. |
-| [`plan`](skills/plan/SKILL.md) | Plan implementation against a separate verification plan, preserving its requirements when the approach changes. |
+| [`plan`](skills/plan/SKILL.md) | Plan implementation and a test-first baseline against the accepted criteria. |
 | [`product-spec`](skills/product-spec/SKILL.md) | Define the user problem, desired outcome, and what success looks like. |
 | [`project-plan`](skills/project-plan/SKILL.md) | Shape an initial project plan with scope, milestones, dependencies, and the specs needed next. |
 | [`prototype`](skills/prototype/SKILL.md) | Reach a concrete goal through a lightweight working prototype and checks suited to that goal. |
@@ -93,7 +93,7 @@ provide it disclosed.
 `deliver` ties together `grill-me`, `research`, `design-verification`, `plan`,
 and `implement` when the full workflow is wanted. It inherits the implementation
 review loop. Each stage also works on its own. A task record holds progress and
-evidence and links the separate verification plan. `deliver` uses `design-review`
+evidence with links to the acceptance criteria and tests. `deliver` uses `design-review`
 and `blast-radius` when the change warrants them.
 
 `project-plan` defines the overall project and its milestones before detailed
@@ -110,20 +110,18 @@ and uses `plan` for verification design and the final plan. Its Python 3
 helper prepares the brief and sourced findings for a fresh agent when available.
 A run can finish after one round and allows up to three.
 
-`design-verification` owns the scenarios, required outcomes, regression
-obligations, and evidence in a durable verification plan. `plan`, `tech-spec`,
-and `decompose` reuse it, creating or revising it through `design-verification`
-when missing or materially incomplete. They reference stable scenario IDs and
-assign the work needed to satisfy them. Changing an implementation approach
-preserves the required outcomes; changing a requirement records the reason.
-Execution details may evolve while proving the same behavior.
+`design-verification` maps each accepted behavior to a test or missing
+assertion. Design-only requests return that mapping in chat unless a document
+is requested. Use the task or an existing specification for the expected
+outcomes. Keep a separate verification plan when the contract needs one.
+`plan`, `tech-spec`, and `decompose` reuse these decisions through replanning.
 
-Verification plans follow the user's destination and project conventions,
-defaulting to `docs/features/<slug>/verification.md`. Chat-only work keeps a
-separately labeled verification plan. `design-review` assesses its adequacy
-and feasibility, while `implement` and `code-review` use it as the acceptance
-reference. Small implementation tasks can still use sufficient accepted
-criteria without requiring a separate document.
+During delivery, write or select the test in the target repository's normal
+suite and run it before product edits. Changed behavior should fail for the
+intended reason. Preserved behavior should pass on both revisions. Run the
+same test on the candidate. Fast tests can run on PRs. Environment-dependent
+tests can run on demand with documented prerequisites. Link the runner output
+and record skips, missing environments, or judgments that still need a person.
 
 `code-review` checks implemented changes with one reviewer. It accepts
 reproducible manual evidence and does not require rerunning supplied proof.
@@ -132,10 +130,8 @@ agent owns fixes. A standalone review leaves code unchanged unless fixes are
 also requested.
 
 Use `create-verification-skill` to capture how to launch, drive, and verify a
-project in a project-local `verify-<project>` skill and feature map. Recipes
-reference relevant verification scenarios and provide runnable steps and helpers;
-required outcomes remain in the verification plan, and observed results belong
-in run evidence. Use
+project in a project-local `verify-<project>` skill. Point to test selectors
+and document setup or human observations needed for a journey. Use
 `maintain-verification-skill` for drift audits or requested upkeep. Audits report
 findings; maintenance requests also authorize scoped instruction and harness
 repairs. Product regressions are reported separately.

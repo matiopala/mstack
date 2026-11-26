@@ -15,7 +15,8 @@ cannot establish.
 
 Read relevant verification plans when present. Use their required outcomes to
 guide the recipes and reference the scenario identifiers they cover. Keep the
-plans authoritative for requirements; recipes own the runnable steps and helpers.
+accepted requirements stable. Look first for repository tests that already
+assert the outcome.
 A separate verification plan is not required to author a project skill.
 
 Check for an existing verification skill before creating another. Follow the
@@ -27,11 +28,13 @@ product problems without authorization; report startup blockers precisely.
 ## Write the project skill
 
 Create `verify-<project>/SKILL.md` with valid name and description frontmatter.
-Default to direct project commands, expected results, and cleanup in a short
-recipe. Existing test output or a plain transcript is usually sufficient
-evidence; do not build custom logging or reporting code merely to retain it.
-Add helpers, including inline code, only when they simplify repeated or fragile
-project interactions or checks. Make helper scripts executable and show their invocation.
+Make the skill a short index of test selectors, commands, and setup a fresh
+runner needs. A request for reusable automated verification includes the missing
+assertions for the requested journeys. Put them in the project's existing test
+suite. Developers must be able to run them without the skill. Use CI when the
+environment supports it. Reuse the native runner's output. Keep instructions for
+on-demand environments and genuine human judgment here. If edits are confined
+to instructions, identify missing tests explicitly.
 
 Write for an agent arriving without this conversation. Include what applies:
 
@@ -59,7 +62,7 @@ trusting a dry-run label. Document any shared-instance restrictions.
 
 ## Map important journeys
 
-Keep short recipes in `SKILL.md`; split them into linked feature files with
+Keep short test references in `SKILL.md`; split them into linked feature files with
 a `features/README.md` index when their number or detail warrants it. Group
 recipes by user-visible behavior, noting any journey-specific prerequisites
 or gotchas. Link existing checks instead of duplicating them. Identify unmapped
@@ -71,7 +74,7 @@ separate from both the verification plan and reusable recipes.
 
 ## Prove and hand off
 
-Replay one complete journey using the generated setup, interaction, evidence,
+Run one referenced test or complete manual journey using the generated setup, evidence,
 and cleanup instructions, including applicable health checks. Confirm artifacts
 survive cleanup, including failed iterations. Fix instruction or harness errors and
 rerun affected steps; never weaken expected behavior to force a pass.

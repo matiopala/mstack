@@ -13,7 +13,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--store", help="Override METHOD_HOME / ~/.local/share/method")
     parser.add_argument("command", choices=("start", "list", "status", "next", "submit", "decide", "import",
-                        "authorize", "run-start", "run-finish", "command", "evidence", "candidate", "verify",
+                        "authorize", "run-start", "run-finish", "baseline", "command", "evidence", "candidate", "test", "verify",
                         "accept", "delivery", "block", "pause", "resume", "resolve", "serve"))
     parser.add_argument("--task", help="Task ID; otherwise read current .tasks/locator.json")
     parser.add_argument("--input", help="JSON payload file; '-' reads stdin")

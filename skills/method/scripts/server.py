@@ -56,7 +56,7 @@ def make_server(store, port=0):
                         evidence = next((e for r in task.load()["runs"] for e in r["evidence"] if e["id"] == parts[5]), None)
                         if evidence is None:
                             raise Error("Unknown evidence")
-                        value = {"text": task.read_blob(evidence).decode("utf-8", errors="replace")}
+                        value = {"text": task.read_evidence(evidence).decode("utf-8", errors="replace")}
                     else:
                         raise Error("Unknown route")
                 elif path in ("/", "/app.js", "/style.css"):

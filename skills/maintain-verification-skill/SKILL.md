@@ -10,7 +10,7 @@ https://github.com/cursor/plugins/blob/main/pstack/skills/maintain-verification-
 ## Establish scope
 
 Locate the project verification skill, its inline or linked recipes, and
-owned helpers.
+owned helpers and referenced repository tests.
 Read any linked verification plans and preserve their scenario references and
 required outcomes while updating execution details. Report gaps or conflicts
 with those requirements; this workflow does not rewrite the verification plan
@@ -22,8 +22,10 @@ For audit or drift-check requests without repair authorization, report findings
 without editing verification instructions or helpers. Maintenance, update, or
 repair requests authorize scoped fixes; proceed without renewed approval.
 
-Honor a requested subset; otherwise audit the whole map. When repairing, edit
-only the verification skill's directory. Keep run evidence separately. Do not
+Honor a requested subset; otherwise audit the whole map. Repair skill instructions
+and owned helpers. When the requested repair covers a referenced verification
+test, fix the assertion or harness in its repository test suite and replay it.
+Keep run evidence separately. Do not
 change product code, create branches, commit, or open PRs unless separately authorized.
 
 ## Check for drift
@@ -81,6 +83,8 @@ remaining failures or blockers. Reference retained evidence instead of repeating
 it. Call the map clean only after full coverage with no unresolved gaps; a scoped
 pass is not a whole-map clean verdict. Unexecuted corrections remain unverified.
 
-Keep reusable instructions in the skill and run-specific results in the task
+Point recipes to the repository's native test selectors. Report missing or
+broken assertions outside the authorized edit scope. Keep setup and manual
+instructions in the skill and run-specific results in the task
 record or artifacts. Do not commit scratch logs or treat an old successful run
 as proof of the current code.

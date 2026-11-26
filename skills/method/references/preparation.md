@@ -34,15 +34,23 @@ Keep incidental implementation choices out of requirements.
 Use stable scenario IDs such as `V01`, each referencing approved requirement IDs.
 For each, describe starting conditions, the real entry point/action, expected
 observable result, required side effects, and evidence that would expose failure.
-Declare `kind: automated` or `kind: human`. Every requirement needs coverage.
+Declare `kind: automated` for objective tests and `kind: human` for judgments
+requiring a person. Every requirement needs coverage. For each automated scenario,
+approve the exact repository-relative `test_files` containing its assertions and
+supporting fixtures, including new files the implementer will author. Review
+those paths as test-only. Declare the expected `baseline` as `fail` for changed
+behavior or `pass` for preservation.
+If using a native JUnit reporter, identify its actual test runner as an argv
+prefix, such as `["python3","-m","pytest"]`. Custom assertion scripts belong
+in the approved test files. Inspect that the runner executes the assertion.
 
 Reuse sufficient project commands and recipes; identify missing prerequisites
 honestly rather than inventing executable commands. Cover success, failure, and
 regression obligations proportional to the change. Coverage percentages are not
 proof. Verify persistence with a fresh read or restart where relevant.
 
-Keep three things distinct: required outcomes here, runnable recipes in project
-instructions/helpers, and observed results in run evidence. Correcting a faulty
+Keep the scenario brief. Put machine-checkable expectations in the target
+project's normal test suite. Record observed outcomes in run evidence. Correcting a faulty
 scenario requires a documented revision and approval; never fit expectations to a
 failing implementation. Preserve stable IDs and explain retired/revised obligations.
 
@@ -50,8 +58,7 @@ failing implementation. Preserve stable IDs and explain retired/revised obligati
 
 Specify the smallest implementation approach that satisfies approved requirements
 and verification scenarios. Resolve consequential APIs, ownership, data flow,
-compatibility, failure handling, and migration choices. Schedule missing test/helper
-work and actual verification. Reference scenario IDs rather than copying criteria.
+compatibility, failure handling, and migration choices. Schedule the test baseline before product changes and a rerun on the candidate. Reference scenario IDs rather than copying criteria.
 Include launch and environment instructions needed by a fresh implementer/verifier.
 
 Interview and exploration may be skipped only on an explicit human decision with

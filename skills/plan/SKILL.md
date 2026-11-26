@@ -29,15 +29,12 @@ when a consequential planning choice warrants creating or revising a record.
 
 ## Establish the verification reference
 
-Read the existing verification plan before choosing the implementation approach.
-Use [design-verification](../design-verification/SKILL.md) when that plan is
-missing or materially incomplete. Reuse adequate plans and their scenario
-identifiers; do not repeat verification design merely because the approach changes.
+Read accepted criteria, tests and any existing verification design before choosing
+the implementation approach. Use [design-verification](../design-verification/SKILL.md)
+to fill material gaps. Reuse adequate scenarios and their identifiers.
 
-Keep the verification plan separate from this implementation plan. Existing
-requirements embedded in an older plan can be separated when touched, preserving
-their meaning and identifiers. Link to the authoritative artifact rather than
-maintaining a second acceptance checklist.
+Keep outcomes stable when the approach changes. Link existing requirements or
+test selectors. A short acceptance section in the task or plan is enough.
 
 ## Define the implementation approach
 
@@ -46,9 +43,9 @@ that achieves it, including consequential interface, data, compatibility,
 and failure-handling decisions. Use phases when they make work easier to
 verify. Leave routine coding details to implementation.
 
-Reference verification scenario identifiers and schedule the implementation,
-check creation, prerequisites, and execution needed to satisfy them. Reuse
-existing tests and project recipes. Creating a reusable project verification
+Schedule test selection or authoring and a baseline run before product edits,
+then rerun those tests on the candidate. Identify any on-demand prerequisites.
+Reuse existing tests and project recipes. Creating a reusable project verification
 skill or auditing its whole map remains separate work.
 
 When replanning, preserve required outcomes and scenario identifiers. Execution
@@ -64,7 +61,7 @@ implementing, and state what evidence or decision is needed to proceed.
 
 Keep the implementation plan and verification reference available for tracking
 work and resuming later. When using a task record, keep implementation progress
-and evidence there and link the separate verification plan. Preserve the agreed
+and evidence there with links to the tests or existing verification design. Preserve the agreed
 brief and record consequential revisions explicitly.
 
 A task record is optional. Otherwise, follow the user's requested output format

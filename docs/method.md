@@ -1,7 +1,8 @@
 # Method workflow
 
 Method moves a task from an idea to a recorded merge. You approve the preparation
-documents, then authorize implementation. An implementer changes the code, and a
+documents, then authorize implementation. An implementer checkpoints the tests on the original product, then changes the
+code. A
 fresh independent verifier checks an exact candidate commit. You try and accept
 the verified candidate before manual delivery.
 
@@ -19,7 +20,8 @@ flowchart TD
     end
 
     Prep --> Auth{"You authorize execution"}
-    Auth --> Build["Implementer agent makes changes"]
+    Auth --> Baseline["Write or select tests and run them on the baseline"]
+    Baseline --> Build["Implementer changes product code"]
     Build --> Candidate["Controller saves an exact candidate commit"]
     Candidate --> Check["Fresh independent verifier tests and reviews it"]
     Check --> Result{"Required checks pass?"}

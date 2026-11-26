@@ -28,7 +28,7 @@ answers and adjustments.
 
 Task records are optional. When working from a task file or tracker issue,
 read its brief, status, and relevant linked context. Use it as the progress hub:
-preserve the agreed brief, link the separate verification plan, and keep
+preserve the agreed brief, reference the acceptance criteria and tests, and keep
 findings, implementation plans, progress, and evidence in place. Record
 consequential revisions without copying verification requirements into competing
 checklists. Otherwise, follow the user's requested format and project conventions.
@@ -52,13 +52,14 @@ Reuse findings from the interview.
 
 Use [design-verification](../design-verification/SKILL.md) to establish the
 required scenarios, outcomes, regression obligations, and evidence separately
-from implementation choices. Reuse an adequate existing verification plan.
-Carry its reference and scenario identifiers into the following stages.
+from implementation choices. Reuse accepted criteria and existing tests.
+Carry their selectors, missing assertions, and any human judgments forward.
 
 ## 4. Plan implementation
 
 Use [plan](../plan/SKILL.md) to define the smallest approach and the work needed
-to satisfy the verification plan. Preserve its requirements during replanning.
+to satisfy the criteria. Schedule test selection or authoring and the baseline
+run before the first product edit. Preserve requirements during replanning.
 Resolve consequential uncertainties before implementation.
 
 Use [design-review](../design-review/SKILL.md) before implementation when the
@@ -66,16 +67,23 @@ solution introduces consequential design choices, such as new ownership
 boundaries or shared contracts. Reuse an existing review when its assumptions
 still hold, and address material findings within the authorized scope.
 
-## 5. Implement, verify, and review
+## 5. Establish the test baseline
+
+Enter [implement](../implement/SKILL.md) once implementation is authorized.
+Write or select the repository tests and run them on the unchanged product.
+Carry the observed failures, characterization passes, and environment gaps forward.
+An end-to-end delivery request covers this step.
+
+## 6. Implement, verify, and review
 
 Reuse downstream risk analysis from research and planning, including effects
 on shared contracts, persisted data, and lifecycle behavior. Use
 [blast-radius](../blast-radius/SKILL.md) when concrete downstream questions
 remain unresolved or new evidence introduces risks. Carry the assumptions and
-regression obligations into the verification plan and check them against the
+regression obligations into the acceptance criteria and check them against the
 final code. Keep review effort proportional to the change.
 
-Use [implement](../implement/SKILL.md) to make the scoped change, verify it
+Continue in the same implementation workflow to make the scoped change, verify it
 against the agreed criteria, and complete its review-and-fix loop. Let that
 skill own the loop; do not add a second delivery review. Report the final
 evidence and review outcome. Missing required evidence or unresolved material

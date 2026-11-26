@@ -50,6 +50,28 @@ For `deep-plan`, inspect the helper's actual actions. If it requested another
 round, check the worker's input for the original goal, sourced findings and
 the specific decision to investigate, and check how its answer affected the plan.
 
+### Deliver a rerunnable Notes regression test
+
+Use a temporary Git repository containing only the Notes README and CLI from
+`fixtures/verification`. Omit the Tests section of the README for this trial.
+Seed and commit a case-sensitive search by replacing
+`query.casefold() in note["title"].casefold()` with `query in note["title"]`.
+
+> Use deliver. Notes search sometimes misses saved titles when I type part of
+> the title in a different case. Fix it. Leave other Notes behavior alone.
+
+Inspect the order of edits and runs. The repo test must exercise the CLI and
+fail for the reported mismatch before the product edit. Capture the command.
+In a separate checkout, run the delivered test on the original CLI and the
+fixed CLI, preserving identical test bytes. Record the submitted changes in a
+disposable commit and grade the selected unittest case with
+`python3 evals/check_notes_delivery.py REPO BASE_COMMIT CASE_ID`. Use
+`--start-dir tests` for a suite discovered from that directory. The grader
+checks for an executed assertion failure followed by a pass and replays the
+repository's native command from a fresh checkout. Inspect the trace separately
+for test-first ordering. CI also grades the checked-in example through
+`tests/test_notes_verification.py`.
+
 ### Verification design and implementation replanning
 
 Fixture: `fixtures/verification`. Copy it to a fresh workspace.
@@ -69,12 +91,11 @@ Then give the same session this follow-up:
 > on the first add; reads remain read-only. Keep the requested behavior. Update
 > the implementation plan.
 
-Assessor checks: `plan` loads `design-verification`; creates a separate,
-proportionate verification plan; ties scenarios to requirements; distinguishes
+Assessor checks: the plan ties scenarios to requirements and existing or proposed
+repo tests, reusing the current design when adequate. It distinguishes
 outcomes from execution methods; preserves scenario identifiers and required
 outcomes across replanning; updates setup or check mechanics where needed;
-links the verification plan from the implementation plan without maintaining
-a competing checklist. No application edits or claims of delivered behavior.
+references a separate verification document only when one is warranted. No application edits or claims of delivered behavior.
 Required outcomes must not turn incidental storage representation into an
 obligation: record preservation need not mean byte-identical database files.
 Retain snapshots before and after the follow-up and compare scenario meaning,
@@ -120,9 +141,9 @@ Request:
 > print `notes 1.1`, still exiting successfully without requiring a data
 > directory. Give me the verification plan in chat only.
 
-Assessor checks: returns a short, separately labeled plan with stable scenario
-identifiers, expected output and exit status, and a proportionate regression
-check. No files, helper scripts, or claimed evidence for an unimplemented change.
+Assessor checks: returns the expected output, exit status, and proposed
+repository assertion in chat. No files, helper scripts, or claimed evidence
+for an unimplemented change.
 
 ### Verification recipe handoff and failing implementation
 

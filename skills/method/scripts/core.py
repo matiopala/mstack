@@ -16,8 +16,9 @@ import tempfile
 import threading
 import time
 import uuid
+from runner_results import selected_result
 
-VERSION = "1.0.0"
+VERSION = "2.0.0"
 STAGES = ("interview", "exploration", "requirements", "verification", "plan")
 ID = re.compile(r"^[a-zA-Z0-9_-]+$")
 
@@ -192,6 +193,56 @@ def target_ref(workspace, target):
 
 def clean(workspace):
     return not git(workspace, "status", "--porcelain", "--untracked-files=all")
+
+
+def test_file_names(scenario):
+    files = scenario.get("test_files")
+    require(isinstance(files, list) and files, "Automated scenarios need test_files naming their assertion and fixtures")
+    for name in files:
+        require(isinstance(name, str) and name and not name.startswith(("/", "-", ":"))
+                and name == Path(name).as_posix() and not {"..", ".git", ".tasks"}.intersection(Path(name).parts)
+                and name != "." and "\x00" not in name, "test_files must be explicit repository-relative files")
+    require(len(set(files)) == len(files), "Duplicate test file")
+    return files
+
+
+def test_sources(workspace, scenario):
+    sources = {}
+    root = Path(workspace).resolve()
+    for name in test_file_names(scenario):
+        path = root / name
+        require(path.resolve() == path and path.is_file(), "Missing or indirect test file: " + name)
+        sources[name] = (path.read_bytes(), bool(path.stat().st_mode & 0o111))
+    return sources
+
+
+def assertion_script(argv, files):
+    if "/" in argv[0] and str(Path(argv[0])) in files:
+        return True
+    interpreter = Path(argv[0]).name
+    if len(argv) < 2 or not re.fullmatch(r"python(?:\d+(?:\.\d+)*)?|node|ruby|perl|php|bash|sh|zsh", interpreter):
+        return False
+    operands = iter(argv[1:])
+    script = next(operands, "")
+    if interpreter.startswith("python"):
+        while script in ("-B", "-u", "-I"):
+            script = next(operands, "")
+    return str(Path(script)) in files
+
+
+def check_baseline_tree(workspace, state, scenarios):
+    require(git(workspace, "rev-parse", "--show-toplevel") == str(Path(workspace).resolve())
+            and git(workspace, "rev-parse", "HEAD") == state["task"]["baseline"],
+            "Run the test baseline at the original task commit")
+    allowed = {os.fsencode(path) for scenario in scenarios if scenario["kind"] == "automated"
+               for path in test_file_names(scenario)}
+    # Include index-only changes, deletions, both ends of renames, and untracked files.
+    for args in (("diff", "--cached", "--no-renames", "--name-only", "-z", "HEAD"),
+                 ("diff", "--no-renames", "--name-only", "-z"),
+                 ("ls-files", "--others", "--exclude-standard", "-z")):
+        changes = set(git(workspace, *args, raw=True).split(b"\0")) - {b""}
+        require(changes <= allowed, "Product or unlisted files changed before the test baseline: "
+                + ", ".join(os.fsdecode(name) for name in sorted(changes - allowed)))
 
 
 def human(data):
@@ -436,6 +487,12 @@ class Task:
             remaining_timeout(deadline)
         return data
 
+    def read_evidence(self, evidence):
+        content = self.read_blob(evidence)
+        if evidence.get("runner_report"):
+            content += b"\nSelected test report\n" + self.read_blob(evidence["runner_report"])
+        return content
+
     def snapshot(self, state):
         return {stage: state["approved"][stage]["sha256"] for stage in STAGES if stage in state["approved"]}
 
@@ -478,6 +535,12 @@ class Task:
         elapsed = time.time() - run["started_epoch"] if run else 0
         return auth["minutes"] * 60 - auth["used_seconds"] - elapsed
 
+    def legacy_test_design(self, state):
+        if "verification" not in state["approved"]:
+            return False
+        return any(s["kind"] == "automated" and (not s.get("test_files") or "baseline" not in s)
+                   for s in self.latest(state, "verification")["criteria"])
+
     def status(self, state):
         if state["pending"]:
             if state["pending"].get("phase") == "initialization":
@@ -487,6 +550,11 @@ class Task:
             return "paused", "Resume explicitly when ready."
         if state["blocker"]:
             return "blocked", state["blocker"]
+        if not state["accepted"] and self.legacy_test_design(state):
+            run = self.current_run(state)
+            if run:
+                return run["role"], "Reconcile this run, then revise the legacy verification design."
+            return "verification", "Revise the legacy verification design with test files and baseline expectations."
         for stage in STAGES:
             if stage not in state["approved"]:
                 artifact = self.latest(state, stage)
@@ -504,6 +572,15 @@ class Task:
         if run:
             if self.remaining(state) <= 0:
                 return "limit", "Execution time exhausted; a human decision is required."
+            if run["role"] == "implementer":
+                design = self.latest(state, "verification")
+                for scenario in design["criteria"]:
+                    if scenario["kind"] == "automated":
+                        baseline = state.get("test_baselines", {}).get(scenario["id"], {})
+                        if (baseline.get("revision") != design["sha256"]
+                                or not (baseline.get("unavailable") or baseline.get("outcome") == scenario["baseline"])):
+                            return "implementer", "Record the test baseline for " + scenario["id"] + " before product edits."
+                return "implementer", "Implement against the checkpointed tests, then finish run " + run["id"] + "."
             return run["role"], "Finish or reconcile run " + run["id"] + "."
         candidate = state["candidates"][-1] if state["candidates"] else None
         if candidate and candidate.get("verification") and not self.needs_candidate(state):
@@ -560,6 +637,10 @@ class Task:
             recovery = command in ("resume", "resolve", "import", "block", "pause") or (
                 command == "run-finish" and data.get("status") in ("interrupted", "blocked"))
             require(not state["blocker"] or recovery, "Task is blocked; resume with a resolution before continuing")
+            executing = command in ("authorize", "run-start", "baseline", "test", "candidate", "verify", "accept") or (
+                command == "run-finish" and data.get("status") == "completed")
+            require(not executing or not self.legacy_test_design(state),
+                    "Revise the legacy verification design with test files and baseline expectations before execution")
             handler = getattr(self, "do_" + command.replace("-", "_"), None)
             require(handler is not None, "Unknown command")
             handler(state, data)
@@ -588,6 +669,13 @@ class Task:
                 refs = scenario.get("requirements", [])
                 require(refs and set(refs) <= requirements, "Scenario must reference approved requirements")
                 require(scenario.get("kind") in ("automated", "human"), "Scenario kind must be automated or human")
+                if scenario["kind"] == "automated":
+                    test_file_names(scenario)
+                    require(scenario.get("baseline") in ("pass", "fail"), "Declare the expected baseline pass or fail")
+                    if "runner" in scenario:
+                        runner = scenario["runner"]
+                        require(isinstance(runner, list) and runner and all(isinstance(a, str) and a for a in runner),
+                                "The approved native runner must be a nonempty argv prefix")
                 covered.update(refs)
             require(covered == requirements, "Every requirement needs a verification scenario")
         revision = 1 + sum(a["stage"] == stage for a in state["artifacts"])
@@ -738,6 +826,8 @@ class Task:
     def do_run_finish(self, state, data):
         run = self.current_run(state)
         require(run and (run["role"] == "implementer" or data.get("status") != "completed"), "Complete verifier runs using verify with a criterion report")
+        if data.get("status") == "completed":
+            self.checked_baselines(state, run["workspace"])
         self.finish(state, data)
 
     def do_evidence(self, state, data):
@@ -748,7 +838,7 @@ class Task:
         evidence.update(description=data["description"], id=uuid.uuid4().hex[:12])
         run["evidence"].append(evidence)
 
-    def do_command(self, state, data):
+    def do_command(self, state, data, *, workspace=None):
         run = self.current_run(state)
         require(run and run["id"] == data.get("run"), "Command must belong to an active run")
         admitted = time.monotonic()
@@ -803,7 +893,13 @@ class Task:
                 state["pending"] = None
                 self.record("command-not-started", {"reason": reason}, state)
                 raise Error(reason)
-            process = subprocess.Popen(argv, cwd=run["workspace"], stdout=output, stderr=subprocess.STDOUT, start_new_session=True)
+            try:
+                process = subprocess.Popen(argv, cwd=workspace or run["workspace"], stdout=output,
+                                           stderr=subprocess.STDOUT, start_new_session=True)
+            except OSError as error:
+                state["pending"] = None
+                self.record("command-not-started", {"reason": str(error)}, state)
+                raise
             try:
                 watcher.start()
                 state["pending"]["pid"] = process.pid
@@ -829,6 +925,146 @@ class Task:
                         timeout=outcome["timeout"], truncated=truncated)
         run["evidence"].append(evidence)
         state["pending"] = None
+        return evidence, content
+
+    def checked_baselines(self, state, workspace):
+        design = self.latest(state, "verification")
+        baselines = {}
+        for scenario in design["criteria"]:
+            if scenario["kind"] == "human":
+                continue
+            baseline = state.get("test_baselines", {}).get(scenario["id"])
+            require(baseline and baseline["revision"] == design["sha256"],
+                    "Record a test baseline for " + scenario["id"] + " under the approved verification design")
+            require(baseline["outcome"] == scenario["baseline"] or baseline.get("unavailable"),
+                    "Unexpected test baseline for " + scenario["id"] + "; investigate and rerun")
+            self.check_test_sources(workspace, scenario, baseline)
+            baselines[scenario["id"]] = baseline
+        return baselines
+
+    def check_test_sources(self, workspace, scenario, baseline):
+        for name, (content, executable) in test_sources(workspace, scenario).items():
+            record = baseline["files"][name]
+            require(content == self.read_blob(record) and executable == record["executable"],
+                    "Test changed since its baseline: " + name + "; review it and rerun on the original product")
+
+    def check_baseline_evidence(self, state, baselines):
+        runs = {run["id"]: run for run in state["runs"]}
+        for scenario_id, baseline in baselines.items():
+            if baseline.get("unavailable"):
+                continue
+            evidence = next((e for e in runs[baseline["run"]]["evidence"] if e["id"] == baseline["evidence"]), None)
+            require(evidence and evidence.get("scenario") == scenario_id and evidence.get("outcome") == baseline["outcome"],
+                    "Missing matching runner evidence for the test baseline")
+            self.read_evidence(evidence)
+
+    def run_test_case(self, state, data, run, workspace, scenario, binding, expected_source=None):
+        with tempfile.TemporaryDirectory(prefix="method-result-") as directory:
+            fmt = binding["format"]
+            report_path = Path(directory) / ("result.xml" if fmt == "junit" else "result.json")
+            command = [arg.replace("{report}", str(report_path)) for arg in binding["argv"]]
+            if fmt == "unittest":
+                module = command.index("-m")
+                command[module:module + 2] = [str(Path(__file__).with_name("unittest_report.py").resolve()),
+                                              str(report_path), binding["selector"]]
+            attempt, output = self.do_command(state, {**data, "argv": command}, workspace=workspace)
+            attempt.update(scenario=scenario["id"], selector=binding["selector"], outcome="unverified")
+            # The process is finished even if reading the report or validating the tree fails.
+            self.record("test-command-finished", {}, state)
+            if attempt["timeout"]:
+                return attempt
+            if fmt in ("junit", "unittest"):
+                if (report_path.is_symlink() or not report_path.is_file()
+                        or report_path.stat().st_size > 10 * 1024 * 1024):
+                    return attempt
+                output = report_path.read_bytes()
+                attempt["runner_report"] = self.blob("runs/" + run["id"], attempt["id"] + report_path.suffix, output)
+            elif attempt["truncated"]:
+                return attempt
+            attempt["outcome"], attempt["source"] = selected_result(
+                fmt, binding["selector"], output, attempt["exit_code"], workspace, scenario["test_files"], expected_source)
+            return attempt
+
+    def do_baseline(self, state, data):
+        run = self.current_run(state)
+        require(run and run["role"] == "implementer" and data.get("run") == run["id"],
+                "Record a baseline during the authorized implementation run")
+        require(self.remaining(state) > 0 and data.get("safe_to_record") is True,
+                "Baseline requires remaining execution time and safe-to-record test files and output")
+        design = self.latest(state, "verification")
+        scenario = next((s for s in design["criteria"] if s["id"] == data.get("scenario") and s["kind"] == "automated"), None)
+        require(scenario and scenario.get("test_files"), "Identify an approved automated scenario with test_files")
+        workspace = Path(data.get("workspace", run["workspace"])).resolve()
+        previous = state.get("test_baselines", {}).get(scenario["id"])
+        require(workspace == Path(run["workspace"]).resolve() or previous or state["candidates"],
+                "Establish the first test baseline in the task workspace before product edits")
+        check_baseline_tree(workspace, state, design["criteria"])
+        sources = test_sources(workspace, scenario)
+        argv, selector, fmt = data.get("argv"), data.get("selector"), data.get("format")
+        require(isinstance(argv, list) and argv and all(isinstance(a, str) and a and "\n" not in a for a in argv)
+                and isinstance(selector, str) and selector.strip() and "\n" not in selector,
+                "Identify the test command argv and exact runner selector")
+        # An absolute operand can run the implementer's copy from the verifier checkout.
+        # Keep URL schemes usable for integration endpoints.
+        outside_checkout = r"(?:^|[=@,'\"\s])/|:(?!//)/|(?:^|[/=\s])\.\.(?:/|$)"
+        require(not any(re.search(outside_checkout, arg) for arg in argv),
+                "Use a runner on PATH or checkout-relative arguments so the test runs against the selected checkout")
+        require(fmt in ("tap", "junit", "unittest") and (fmt != "junit" or any("{report}" in arg for arg in argv)),
+                "Use unittest, single-assertion tap, or junit with a fresh {report} output path")
+        if fmt == "unittest":
+            require("-m" in argv and argv[argv.index("-m") + 1:argv.index("-m") + 2] == ["unittest"],
+                    "Use the project's Python interpreter with -m unittest")
+        else:
+            runner = scenario.get("runner", [])
+            native = fmt == "junit" and runner and argv[:len(runner)] == runner
+            require(native or assertion_script(argv, scenario["test_files"]),
+                    "Invoke an approved assertion script directly or use the approved native JUnit runner")
+        binding = {"argv": argv, "selector": selector, "format": fmt}
+        if previous:
+            require(isinstance(data.get("reason"), str) and data["reason"].strip(),
+                    "Explain the baseline retry or assertion change")
+        unavailable = data.get("unavailable")
+        if unavailable is not None:
+            require(isinstance(unavailable, str) and unavailable.strip(), "Identify the unavailable environment prerequisite")
+            outcome, evidence, source = "unverified", None, None
+        else:
+            state.setdefault("test_baselines", {})[scenario["id"]] = {
+                "revision": design["sha256"], "outcome": "unverified", "run": run["id"]}
+            attempt = self.run_test_case(state, data, run, workspace, scenario, binding)
+            outcome, evidence, source = attempt["outcome"], attempt["id"], attempt.get("source")
+            check_baseline_tree(workspace, state, design["criteria"])
+            require(sources == test_sources(workspace, scenario), "Test files changed during baseline execution")
+        folder = "runs/" + run["id"] + "/baselines/" + uuid.uuid4().hex
+        files = {}
+        for index, (name, (content, executable)) in enumerate(sources.items()):
+            # Git may normalize working bytes (e.g. text eol=crlf) before storing a blob.
+            object_id = git(workspace, "hash-object", "--path=" + name, "--stdin", input=content, raw=True)
+            files[name] = {**self.blob(folder, str(index), content), "executable": executable,
+                           "git_blob": object_id.decode("ascii").strip()}
+        state.setdefault("test_baselines", {})[scenario["id"]] = {
+            "revision": design["sha256"], "commit": state["task"]["baseline"], "run": run["id"],
+            "binding": binding, "files": files, "outcome": outcome, "evidence": evidence, "source": source,
+            "unavailable": unavailable}
+
+    def do_test(self, state, data):
+        run = self.current_run(state)
+        require(run and run["role"] == "verifier" and run["id"] == data.get("run"), "Identify the active verifier run")
+        candidate = state["candidates"][-1]
+        require(run["candidate"] == candidate["id"] and not self.needs_candidate(state), "Verify the authorized candidate")
+        scenario_id = data.get("scenario")
+        baseline = candidate.get("test_baselines", {}).get(scenario_id)
+        require(baseline, "Candidate has no test baseline for this scenario; capture a new implementation candidate")
+        scenario = next(s for s in self.latest(state, "verification")["criteria"] if s["id"] == scenario_id)
+        workspace = run["workspace"]
+        require(git(workspace, "rev-parse", "HEAD") == candidate["commit"] and clean(workspace),
+                "Run the selected test on the clean candidate")
+        self.check_test_sources(workspace, scenario, baseline)
+        latest = run.setdefault("latest_tests", {})
+        latest[scenario_id] = None
+        attempt = self.run_test_case(state, data, run, workspace, scenario, baseline["binding"], baseline.get("source"))
+        require(git(workspace, "rev-parse", "HEAD") == candidate["commit"] and clean(workspace),
+                "Test changed candidate source; reconcile the verifier run")
+        latest[scenario_id] = attempt["id"]
 
     def do_candidate(self, state, data):
         self.idle(state)
@@ -841,17 +1077,33 @@ class Task:
         workspace = self.assert_workspace(state)
         expected = state["candidates"][-1]["commit"] if state["candidates"] else state["task"]["baseline"]
         self.assert_workspace(state, expected)
+        baselines = self.checked_baselines(state, workspace)
+        self.check_baseline_evidence(state, baselines)
+        files = {name: blob for baseline in baselines.values() for name, blob in baseline["files"].items()}
+        if files:
+            eligible = git(workspace, "--literal-pathspecs", "ls-files", "--cached", "--others", "--exclude-standard",
+                           "-z", "--", *files, raw=True).split(b"\0")
+            require(all(os.fsencode(name) in eligible for name in files),
+                    "A checkpointed test file is ignored or missing; include it in the repository before capture")
         paths = data.get("paths", [])
         require(isinstance(paths, list) and all(isinstance(p, str) and not p.startswith(('-', '/', ':')) and '..' not in Path(p).parts and '.tasks' not in Path(p).parts for p in paths), "Provide explicit relative product paths; no traversal or Git pathspec magic")
         self.check_staged_paths(workspace, paths)
         cid = uuid.uuid4().hex[:12]
         state["pending"] = {"kind": "candidate", "id": cid, "run": run["id"], "before": expected, "paths": paths, "commit": None}
+        state["pending"]["test_baselines"] = baselines
         self.record("candidate-intent", {}, state)
         if paths:
             git(workspace, "--literal-pathspecs", "add", "--", *paths)
         self.check_staged_paths(workspace, paths)
         require(not git(workspace, "diff", "--name-only") and not git(workspace, "ls-files", "--others", "--exclude-standard"), "Unstaged source remains; reconcile without discarding it")
         tree = git(workspace, "write-tree")
+        for name, blob in files.items():
+            entry = git(workspace, "--literal-pathspecs", "ls-tree", "-z", tree, "--", name, raw=True)
+            mode = b"100755" if blob["executable"] else b"100644"
+            if entry.partition(b"\t")[0].split() != [mode, b"blob", blob["git_blob"].encode("ascii")]:
+                state["pending"] = None
+                self.record("candidate-rejected", {"file": name}, state)
+                raise Error("Staged test differs from its baseline: " + name + "; reconcile the preserved index and retry")
         commit = git(workspace, "commit-tree", tree, "-p", expected, input=f"method: candidate {cid}\n")
         state["pending"]["commit"] = commit
         self.record("candidate-created", {}, state)
@@ -893,7 +1145,7 @@ class Task:
         state["candidates"].append({"id": pending["id"], "commit": commit, "run": pending["run"],
                                     "at": now(), "revisions": self.snapshot(state), "bundle": bundle,
                                     "diff": {"path": str(diff_path.relative_to(self.path)), "sha256": digest(diff)},
-                                    "verification": None})
+                                    "verification": None, "test_baselines": pending.get("test_baselines", {})})
         state["authorization"]["needs_implementation"] = False
         state.update(pending=None, accepted=None, delivery=None)
 
@@ -906,6 +1158,7 @@ class Task:
         require(self.remaining(state) > 0, "Execution time exhausted; finish as interrupted instead")
         candidate = state["candidates"][-1]
         require(git(run["workspace"], "rev-parse", "HEAD") == candidate["commit"] and clean(run["workspace"]), "Verifier changed candidate source; record interruption and return corrections to implementer")
+        self.check_baseline_evidence(state, candidate.get("test_baselines", {}))
         scenarios = self.latest(state, "verification")["criteria"]
         results = data.get("results", [])
         require(len(results) == len(scenarios) and {r.get("id") for r in results} == {s["id"] for s in scenarios}, "Report every approved verification scenario exactly once")
@@ -922,8 +1175,12 @@ class Task:
             if result["outcome"] in ("pass", "fail"):
                 refs = result.get("evidence", [])
                 require(refs and all(ref in evidence for ref in refs), "Pass/fail needs evidence from this run")
+                if scenario["kind"] == "automated":
+                    latest = evidence.get(run.get("latest_tests", {}).get(scenario["id"]))
+                    require(latest and latest["id"] in refs and latest["outcome"] == result["outcome"],
+                            "The selected test must execute and its latest runner result must support " + result["outcome"])
                 for ref in refs:
-                    self.read_blob(evidence[ref])
+                    self.read_evidence(evidence[ref])
         findings = data.get("findings", [])
         require(isinstance(findings, list) and all(f.get("id") and f.get("description") and f.get("severity") in ("blocking", "optional") and f.get("status") in ("open", "resolved", "rejected") for f in findings), "Findings need id, description, severity, and status")
         require(all(f.get("resolution") for f in findings if f["status"] != "open"), "Resolved or rejected findings need supported resolutions")
@@ -940,7 +1197,7 @@ class Task:
                 refs = finding.get("evidence", [])
                 require(refs and all(ref in evidence for ref in refs), "Finding resolution requires evidence from this candidate's run")
                 for ref in refs:
-                    self.read_blob(evidence[ref])
+                    self.read_evidence(evidence[ref])
         ready = ready and not any(f["severity"] == "blocking" and f["status"] == "open" for f in findings)
         require(data.get("review") and data.get("launch") and data.get("tradeoffs"), "Record review coverage, launch instructions, and implementation tradeoffs")
         report = {"run": run["id"], "candidate": candidate["id"], "ready": ready, "results": results,
@@ -963,9 +1220,13 @@ class Task:
         self.read_blob(candidate["bundle"])
         self.read_blob(candidate["diff"])
         self.read_blob(candidate["verification"]["artifact"])
+        self.check_baseline_evidence(state, candidate.get("test_baselines", {}))
+        for baseline in candidate.get("test_baselines", {}).values():
+            for source in baseline["files"].values():
+                self.read_blob(source)
         verified_run = next(r for r in state["runs"] if r["id"] == candidate["verification"]["run"])
         for evidence in verified_run["evidence"]:
-            self.read_blob(evidence)
+            self.read_evidence(evidence)
         require(data.get("requirements") == state["approved"]["requirements"]["sha256"], "Acceptance must bind current requirements")
         require(candidate["revisions"] == self.snapshot(state), "Candidate approvals are stale")
         workspace = self.assert_workspace(state, candidate["commit"])

@@ -10,16 +10,20 @@ Register and brief the implementer using [hosts.md](hosts.md). Include this role
 contract. The implementer returns changes and evidence to the coordinator; it must
 not delegate, change requirements, approve artifacts, or modify Method records.
 
-Implement the smallest complete scoped change using project conventions. For bugs,
-reproduce the failure through the affected entry point and test the cause hypothesis.
-Reuse existing checks; add tests/helpers for concrete missing coverage. Measure
-performance claims. Do not add unrelated abstractions or maintenance work.
+Brief the implementer to select or write the approved tests first, then yield
+before editing product code. Use the project's normal suite. The coordinator
+runs `baseline` for each automated scenario and inspects the runner outcome.
+For a change or bug, confirm the assertion failed for the intended reason.
+Preservation tests should pass. Investigate an unexpected result. A required
+on-demand environment can be recorded as unavailable with its exact prerequisite.
+See the [test command contracts](records.md#test-baselines-and-candidate-runs).
 
-The implementer owns product, tests, and necessary verification recipes/helpers.
-Any created recipe should contain exact prerequisites, launch, health checks,
-interaction, expected outcomes, evidence, and cleanup. Helpers need to simplify
-fragile or repeated interactions. Prove the recipe against the app before relying
-on it. Product defects must not become weaker recipe expectations.
+After the checkpoints, implement the scoped product change. Keep reusable tests
+in the repository, document their normal invocation and any on-demand setup,
+and include new tests and fixtures in the candidate. Review changed assertions
+and refresh their checkpoints on the original product. When the task workspace
+already has product edits, use a separate baseline checkout with the revised
+test files. Preserve the existing workspace. Reuse current checkpoints on retries.
 
 Use `command` for finite checks with safe-to-record output; it tracks process groups,
 timeouts, and evidence. For native/browser tools or long-running application servers,

@@ -24,7 +24,7 @@ usable; a separate document is not a prerequisite for implementation.
 When working from a task file or tracker issue, read its brief, status, and
 linked context. Preserve the agreed brief and acceptance criteria. Keep the
 implementation plan, progress, consequential revisions, and verification evidence
-in that record, linking the separate verification plan rather than copying it.
+in that record, referencing tests or an existing verification design.
 A task record is optional; otherwise, follow the user's requested output format
 and project conventions.
 
@@ -32,11 +32,24 @@ Consult relevant accepted decision records before changing code. Load
 [adr](../adr/SKILL.md) only when a consequential choice or deviation warrants
 creating or revising a record; link it from the plan or task record.
 
+## Establish the test baseline before editing product code
+
+Select an existing test that asserts each objective acceptance criterion or
+write the missing assertion in the target repository's normal test suite.
+Use the narrowest test that exercises the affected entry point and side effects.
+A verification test is an ordinary test a developer can rerun without an agent.
+Give environment-dependent tests an on-demand command and prerequisites.
+
+Run the selected tests on the unchanged product. For new behavior or a bug,
+observe the intended failure. Investigate an unexpected pass or a fixture error
+before editing the product. For preserved behavior, establish a passing
+characterization. If the environment is unavailable, write the test where
+feasible, record the missing prerequisite, and leave that result unverified.
+Keep the commands and outcomes for comparison on the candidate.
+
 ## Implement
 
-Make scoped increments. Reuse sufficient existing acceptance and regression
-checks; add or update checks only for concrete coverage gaps. Establish relevant
-baseline behavior when useful.
+Make scoped increments against those tests.
 
 For bug fixes, reproduce the failure through the affected entry point. Form
 a cause hypothesis and check it against observed behavior, traces, or a
@@ -74,18 +87,18 @@ and resolve the decision with the user. Honor authorization already given.
 Preserve verification scenario identifiers and required outcomes when the
 implementation approach changes. Execution details may be adapted while proving
 the same requirements. Document requirement additions or revisions and their
-reasons in the verification plan; do not silently redefine success.
+reasons alongside their acceptance criteria. When an assertion changes, review
+why and rerun it against the baseline as well as the candidate.
 
 ## Prove delivery
 
 Require irrefutable proof: reproducible, inspectable evidence that the
 acceptance criteria hold under the stated test conditions.
 
-Use relevant recipes from an existing project verification skill to collect
-fresh evidence. Update affected recipes within the authorized change scope;
-do not weaken expected behavior to match a regression. Keep reusable steps in
-the skill and observed results in the task record or artifacts. Do not require
-skill creation or a full maintenance audit for routine delivery.
+Run the same tests on the final code. Verify that each selected test executed
+and passed. An empty or skipped selection leaves the requirement unverified.
+Use project verification instructions for setup, on-demand runs, and genuine
+manual judgments. Link runner output and explain gaps in the task or PR.
 
 Exercise the relevant user or system entry point without bypassing the changed
 logic. Observe both the action and its result. Verify required side effects;

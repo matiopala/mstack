@@ -85,7 +85,8 @@ Verification scenarios include their requirement references and type:
 ```json
 {"stage":"verification","file":"/tmp/verification.md","criteria":[
   {"id":"V01","text":"Create a note and list it in a fresh process.",
-   "requirements":["R01"],"kind":"automated"}
+   "requirements":["R01"],"kind":"automated","baseline":"fail",
+   "test_files":["tests/test_notes.py"]}
 ]}
 ```
 
@@ -157,6 +158,67 @@ the local Git identity, retaining a named ref, self-contained bundle, and baseli
 It does not execute commit hooks; run project-required checks explicitly. Empty
 checkpoints are permitted for an authorized no-source-change correction.
 
+## Test baselines and candidate runs
+
+`baseline` runs during an active implementer run and before product edits. Bind
+a scenario to its actual command and exact runner case. For example, for a
+file with one Python test:
+
+```json
+{"run":"implementer-run-id","scenario":"V01","safe_to_record":true,
+ "format":"unittest","selector":"test_notes.NotesTests.test_persistence",
+ "argv":["python3","-B","-m","unittest","discover","-s","tests","-p","test_notes.py","-v"]}
+```
+
+The controller requires the original task commit and permits tracked, staged,
+or untracked changes only in approved test files. List shared fixtures and
+helpers that determine the assertion in every scenario that uses them. The
+checkpoint retains the exact files, executable bits, command, and baseline
+outcome. A mismatched result blocks completion. Investigate the diagnostic and
+retry with a `reason`. If a required environment is unavailable, include
+`unavailable` with the precise prerequisite to retain the runnable test and
+baseline gap. No pass or failure is credited for that baseline.
+
+On a revision, pass a `reason` and, if needed, an absolute `workspace` pointing
+to a separate checkout at the original task commit with the revised tests.
+The first baseline for a new task uses the registered implementation workspace.
+The current files must still match when finishing implementation, capturing
+the candidate, and testing it. Include the tests in the candidate's paths.
+
+`test` takes `run`, `scenario`, `safe_to_record: true`, and optional `timeout`.
+It uses the checkpointed argv in the independent verifier checkout. Configure
+the project's usual test environment, including on-demand prerequisites.
+Use a runner on PATH or a checkout-relative executable and operands. Configure
+external service locations through the project's test environment. Both commands
+retain output and enforce the command timeout. A successful CLI recording can contain a failed or
+unverified test. Inspect the returned evidence's `outcome`.
+
+For JUnit, approve the native test runner in the scenario's optional `runner`
+argv prefix (for example `["python3","-m","pytest"]`), or use an approved
+repository script. For TAP, execute the approved script by checkout-relative
+path, or pass it as the script operand of Python, Node, Ruby, Perl, PHP, or a
+shell interpreter. Python can take `-B`, `-I`, or `-u` first. Inspect scripts
+for real assertions and use a shebang for other interpreters.
+
+| Format | What establishes execution |
+| --- | --- |
+| `junit` | Write fresh XML to the literal `{report}` placeholder (e.g. `--junitxml={report}`). Select exactly one `classname.name`, or `name` without a classname. Reported source files must be approved, and a source identified on the baseline must match on the candidate. An assertion failure counts as red. A runner-reported error or skip is unverified. |
+| `unittest` | Use the project's Python with `-m unittest` and the fully qualified case ID. Method adds a standard-library result reporter and checks that the case ran exactly once from an approved file. A fixture failure or skipped case is unverified. |
+| `tap` | A standalone assertion script emitting a one-test TAP plan (`1..1`) and `ok 1 - <selector>` or `not ok 1 - <selector>`. Diagnostic comment lines are allowed. |
+
+An executed passing case also requires successful process exit. An expected
+negative application action belongs inside a test that asserts that behavior.
+For JUnit reporters that omit file attribution, choose a unique case ID and
+review the bound runner command to confirm it selects the intended test.
+A plain transcript can supplement a result. It cannot establish an automated
+pass. If a runner uses another format, use its JUnit reporter or an assertion
+script that emits the one-test TAP result.
+
+Existing task history and completed deliveries remain readable. To continue
+an older task whose approved automated scenarios lack test files and baseline
+expectations, revise the verification and downstream preparation and authorize
+a new implementation candidate. Prior observations remain historical evidence.
+
 ## Verification, acceptance, delivery
 
 `verify` takes the active verifier `run`, `processes_stopped: true`, and:
@@ -177,7 +239,8 @@ checkpoints are permitted for an authorized no-source-change correction.
 
 Every scenario appears exactly once. Outcomes: `pass`, `fail`, `unverified`, or
 `human_pending` for human scenarios only. Pass/fail requires this run's retained
-evidence IDs. Findings contain `id`, `description`, `severity` (`blocking`/`optional`),
+evidence IDs. Automated pass/fail must match the latest `test` result for that
+scenario and cite its evidence ID. Findings contain `id`, `description`, `severity` (`blocking`/`optional`),
 `status` (`open`/`resolved`/`rejected`), and a supported `resolution` when not open.
 Resolved/rejected findings also need `evidence` IDs from the current run. Carry
 forward unresolved blocking finding IDs; do not silently omit or downgrade them.

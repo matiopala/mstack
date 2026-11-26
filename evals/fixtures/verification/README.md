@@ -24,6 +24,10 @@ first note creates it. `doctor`, `list`, and `search` are read-only.
 - The add flag was intentionally renamed from `--text` to `--title`.
   `--text` is no longer supported. No search behavior change was approved.
 
+## Tests
+
+Run `python3 -m unittest discover -s tests -v` from the project root.
+
 ## Project conventions
 
 This project uses Claude Code project skills in `.claude/skills/`. Keep

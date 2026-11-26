@@ -23,6 +23,25 @@ sys.path.insert(0, str(SCRIPTS))
 from core import Error, STAGES, Store, Task, atomic, git, lock, target_ref
 from server import make_server
 
+GREETING_TEST = """import os
+import subprocess
+import sys
+import unittest
+
+class Greeting(unittest.TestCase):
+    def test_cli(self):
+        if os.environ.get("METHOD_GREETING_FIXTURE") == "skip":
+            self.skipTest("Fixture service unavailable")
+        output = subprocess.check_output([sys.executable, "app.py"], text=True).strip()
+        expected = os.environ.get("METHOD_GREETING_FIXTURE")
+        if expected:
+            self.assertEqual(output, expected)
+        else:
+            self.assertTrue(output)
+"""
+GREETING_RUN = {"selector": "test_greeting.Greeting.test_cli", "format": "unittest",
+                "argv": ["python3", "-B", "-m", "unittest", "-v", "test_greeting.Greeting.test_cli"]}
+
 
 class MethodTests(unittest.TestCase):
     def setUp(self):
@@ -35,7 +54,8 @@ class MethodTests(unittest.TestCase):
         git(self.repo, "config", "user.email", "method@example.invalid")
         git(self.repo, "config", "user.name", "Method Test")
         (self.repo / "app.py").write_text("print('hello')\n")
-        git(self.repo, "add", "app.py")
+        (self.repo / "test_greeting.py").write_text(GREETING_TEST)
+        git(self.repo, "add", "app.py", "test_greeting.py")
         git(self.repo, "commit", "-m", "baseline")
         self.store = Store(self.root / "store")
         self.task = self.store.task(self.store.start({"workspace": str(self.repo), "target": "main", "title": "Improve the greeting"})["id"])
@@ -43,7 +63,7 @@ class MethodTests(unittest.TestCase):
     def apply(self, command, **data):
         return self.task.apply(command, data)
 
-    def prepare(self, manual=False):
+    def prepare(self, manual=False, baseline="pass", test_files=None, runner=None):
         for stage in STAGES:
             file = self.root / (stage + ".md")
             file.write_text("# " + stage.title() + "\n\nThe application greets the user.\n")
@@ -51,7 +71,10 @@ class MethodTests(unittest.TestCase):
             if stage == "requirements":
                 criteria = [{"id": "R01", "text": "Greet the user"}]
             if stage == "verification":
-                criteria = [{"id": "V01", "text": "Run the actual CLI", "requirements": ["R01"], "kind": "automated"}]
+                criteria = [{"id": "V01", "text": "The CLI prints a greeting", "requirements": ["R01"],
+                             "kind": "automated", "baseline": baseline, "test_files": test_files or ["test_greeting.py"]}]
+                if runner:
+                    criteria[0]["runner"] = runner
                 if manual:
                     criteria.append({"id": "V02", "text": "Check usefulness", "requirements": ["R01"], "kind": "human"})
             self.apply("submit", stage=stage, file=str(file), criteria=criteria)
@@ -61,8 +84,15 @@ class MethodTests(unittest.TestCase):
     def authorize(self, mode="implementation", **kwargs):
         self.apply("authorize", revisions=self.task.snapshot(self.task.load()), instruction="Implement this approved work." if mode == "implementation" else "Collect more evidence.", mode=mode, **kwargs)
 
-    def implementation(self, actor="implementer-1"):
+    def start_implementation(self, actor):
         self.apply("run-start", role="implementer", actor=actor)
+        state = self.task.load()
+        if not state.get("test_baselines"):
+            self.apply("baseline", run=self.task.current_run(state)["id"], scenario="V01",
+                       safe_to_record=True, **GREETING_RUN)
+
+    def implementation(self, actor="implementer-1"):
+        self.start_implementation(actor)
         run = self.task.current_run(self.task.load())
         (self.repo / "app.py").write_text("print('hello, world')\n")
         self.apply("run-finish", run=run["id"], status="completed", processes_stopped=True, summary="Changed greeting; all owned commands finished.")
@@ -72,7 +102,7 @@ class MethodTests(unittest.TestCase):
     def verification(self, outcome="pass", findings=None, actor="verifier-1"):
         self.apply("run-start", role="verifier", actor=actor)
         run = self.task.current_run(self.task.load())
-        self.apply("command", run=run["id"], argv=[sys.executable, "app.py"], safe_to_record=True)
+        self.run_greeting(run, outcome)
         run = self.task.current_run(self.task.load())
         results = [{"id": "V01", "outcome": outcome, "observed": "Observed actual CLI output", "evidence": [run["evidence"][0]["id"]]}]
         if len(self.task.latest(self.task.load(), "verification")["criteria"]) > 1:
@@ -82,6 +112,11 @@ class MethodTests(unittest.TestCase):
                 if finding["status"] != "open":
                     finding["evidence"] = [run["evidence"][0]["id"]]
         self.apply("verify", run=run["id"], processes_stopped=True, results=results, findings=findings or [], review="Reviewed the actual diff", launch="python3 app.py", tradeoffs="Keeps the existing CLI")
+
+    def run_greeting(self, run, outcome):
+        setting = {"pass": "", "unverified": "skip", "fail": "different greeting"}[outcome]
+        with patch.dict(os.environ, {"METHOD_GREETING_FIXTURE": setting}):
+            self.apply("test", run=run["id"], scenario="V01", safe_to_record=True)
 
     def test_complete_flow_requires_actual_delivery(self):
         self.prepare(manual=True)
@@ -517,7 +552,8 @@ class MethodTests(unittest.TestCase):
                         git(repo, "config", "user.email", "method@example.invalid")
                         git(repo, "config", "user.name", "Method Test")
                         (repo / "app.py").write_text("print('baseline')\n")
-                        git(repo, "add", "app.py"); git(repo, "commit", "-m", "baseline")
+                        (repo / "test_greeting.py").write_text(GREETING_TEST)
+                        git(repo, "add", "app.py", "test_greeting.py"); git(repo, "commit", "-m", "baseline")
                         fixture.repo = repo
                         fixture.task = fixture.store.task(fixture.store.start({"workspace": str(repo), "target": "main", "title": "Object format"})["id"])
                         fixture.prepare(); fixture.authorize()
@@ -672,7 +708,7 @@ class MethodTests(unittest.TestCase):
         self.repo = repo
         self.task = self.store.task(self.store.start({"workspace": str(repo), "target": "main", "title": "Recover capture"})["id"])
         self.prepare(); self.authorize()
-        self.apply("run-start", role="implementer", actor="initial")
+        self.start_implementation("initial")
         run = self.task.current_run(self.task.load())
         (self.repo / "app.py").write_text("print('checkpoint')\n")
         self.apply("run-finish", run=run["id"], status="completed", processes_stopped=True, summary="Ready")
@@ -826,7 +862,7 @@ class MethodTests(unittest.TestCase):
 
     def test_blocker_freezes_progress_until_explicit_resume(self):
         self.prepare(); self.authorize()
-        self.apply("run-start", role="implementer", actor="blocker-fixture")
+        self.start_implementation("blocker-fixture")
         run = self.task.current_run(self.task.load())
         (self.repo / "app.py").write_text("print('changed')\n")
         self.apply("run-finish", run=run["id"], status="completed", summary="Ready", processes_stopped=True)
@@ -1050,6 +1086,245 @@ class MethodTests(unittest.TestCase):
             self.apply("verify", run=run["id"], processes_stopped=True, results=[{"id": "V01", "outcome": "pass", "observed": "Trust me", "evidence": []}], findings=[], review="Good", launch="Run", tradeoffs="None")
         self.assertEqual(self.task.current_run(self.task.load())["status"], "running")
 
+    def test_automated_pass_rejects_unrelated_command(self):
+        self.prepare()
+        self.authorize()
+        self.implementation()
+        self.apply("run-start", role="verifier", actor="independent")
+        run = self.task.current_run(self.task.load())
+        self.apply("command", run=run["id"], argv=[sys.executable, "app.py"], safe_to_record=True)
+        output = self.task.current_run(self.task.load())["evidence"][-1]
+        with self.assertRaisesRegex(Error, "selected test"):
+            self.apply("verify", run=run["id"], processes_stopped=True,
+                       results=[{"id": "V01", "outcome": "pass", "observed": "CLI launched",
+                                 "evidence": [output["id"]]}],
+                       findings=[], review="Checked CLI", launch="python3 app.py", tradeoffs="Existing CLI")
+
+    def test_implementation_requires_test_baseline(self):
+        self.prepare()
+        self.authorize()
+        self.apply("run-start", role="implementer", actor="implementer")
+        run = self.task.current_run(self.task.load())
+        with self.assertRaisesRegex(Error, "baseline"):
+            self.apply("run-finish", run=run["id"], status="completed", processes_stopped=True,
+                       summary="Product edits finished without running the test")
+
+    def test_baseline_rejects_absolute_checkout_arguments(self):
+        self.prepare()
+        self.authorize()
+        self.apply("run-start", role="implementer", actor="author")
+        run = self.task.current_run(self.task.load())
+        path = str(self.repo / "test_greeting.py")
+        for arg in (path, "--file=" + path, "/" + path, "--file=/" + path):
+            with self.subTest(arg=arg), self.assertRaisesRegex(Error, "checkout-relative"):
+                self.apply("baseline", run=run["id"], scenario="V01", safe_to_record=True,
+                           format="tap", selector="greeting", argv=["python3", arg])
+
+    def test_saved_runner_output_cannot_be_bound_as_a_test(self):
+        self.prepare(test_files=["test_greeting.py", "last-output.tap", "last-output.xml"])
+        self.authorize()
+        self.apply("run-start", role="implementer", actor="author")
+        run = self.task.current_run(self.task.load())
+        (self.repo / "last-output.tap").write_text("1..1\nok 1 - greeting\n")
+        (self.repo / "last-output.xml").write_text("<testsuite><testcase name='greeting'/></testsuite>")
+        for fmt, argv in (("tap", ["cat", "last-output.tap"]), ("junit", ["cp", "last-output.xml", "{report}"])):
+            with self.subTest(fmt=fmt), self.assertRaisesRegex(Error, "approved assertion script"):
+                self.apply("baseline", run=run["id"], scenario="V01", safe_to_record=True,
+                           format=fmt, selector="greeting", argv=argv)
+
+    def test_candidate_cannot_omit_ignored_test(self):
+        self.prepare(test_files=["generated.py"])
+        self.authorize()
+        self.apply("run-start", role="implementer", actor="author")
+        run = self.task.current_run(self.task.load())
+        with (self.repo / ".git/info/exclude").open("a") as exclude:
+            exclude.write("\ngenerated.py\n")
+        (self.repo / "generated.py").write_text(GREETING_TEST)
+        selector = "generated.Greeting.test_cli"
+        self.apply("baseline", run=run["id"], scenario="V01", safe_to_record=True,
+                   format="unittest", selector=selector, argv=["python3", "-B", "-m", "unittest", selector])
+        self.apply("run-finish", run=run["id"], status="completed", summary="Capturing", processes_stopped=True)
+        with self.assertRaisesRegex(Error, "ignored"):
+            self.apply("candidate", paths=[])
+        self.assertIsNone(self.task.load()["pending"])
+        self.assertFalse(self.task.load()["candidates"])
+        git(self.repo, "add", "-f", "generated.py")
+        self.apply("candidate", paths=["generated.py"])
+        self.assertEqual(git(self.repo, "show", "HEAD:generated.py", raw=True), GREETING_TEST.encode())
+
+    def test_baseline_preserves_checkout_bytes_with_git_text_normalization(self):
+        repo = self.root / "normalized"
+        git(self.root, "clone", "-q", "-b", "main", str(self.repo), str(repo))
+        git(repo, "config", "user.name", "Method Test")
+        git(repo, "config", "user.email", "method@example.invalid")
+        (repo / ".gitattributes").write_text("test_greeting.py text eol=crlf\n")
+        (repo / "test_greeting.py").write_bytes(GREETING_TEST.replace("\n", "\r\n").encode())
+        git(repo, "add", ".gitattributes", "test_greeting.py")
+        git(repo, "commit", "-qm", "Normalize the stored test")
+        self.repo = repo
+        self.task = self.store.task(self.store.start({"workspace": str(repo), "target": "main", "title": "CRLF"})["id"])
+        self.prepare()
+        self.authorize()
+        candidate = self.implementation()
+        self.assertNotIn(b"\r\n", git(repo, "show", "HEAD:test_greeting.py", raw=True))
+        pinned = self.task.read_blob(candidate["test_baselines"]["V01"]["files"]["test_greeting.py"])
+        self.assertIn(b"\r\n", pinned)
+        self.verification()
+        self.assertEqual(self.task.view()["status"], "human_review")
+
+    def test_in_progress_legacy_report_cannot_satisfy_new_acceptance(self):
+        self.prepare()
+        self.authorize()
+        candidate = self.implementation()
+        self.verification()
+        state = self.task.load()
+        design = self.task.latest(state, "verification")
+        for key in ("test_files", "baseline"):
+            design["criteria"][0].pop(key)
+        state["candidates"][-1].pop("test_baselines")
+        self.task.record("legacy-task-fixture", {}, state)
+        self.assertEqual(self.task.view()["status"], "verification")
+        with self.assertRaisesRegex(Error, "legacy verification"):
+            self.apply("accept", candidate=candidate["commit"], requirements=candidate["revisions"]["requirements"],
+                       instruction="Try accepting a historical pass", observations={})
+        self.assertTrue(self.task.load()["candidates"][-1]["verification"]["ready"])
+
+    def test_accept_rechecks_retained_baseline_runner_evidence(self):
+        self.prepare()
+        self.authorize()
+        candidate = self.implementation()
+        self.verification()
+        evidence = self.task.load()["runs"][0]["evidence"][0]
+        for reference in (evidence, evidence["runner_report"]):
+            path = self.task.path / reference["path"]
+            original = path.read_bytes()
+            path.write_text("changed after verification")
+            with self.assertRaisesRegex(Error, "Retained artifact changed"):
+                self.apply("accept", candidate=candidate["commit"], requirements=candidate["revisions"]["requirements"],
+                           instruction="Accept the tested candidate", observations={})
+            path.write_bytes(original)
+
+    def test_junit_reports_must_be_fresh_and_identify_the_selected_case(self):
+        runner = ["python3", "-B", "-m", "junit_check"]
+        self.prepare(test_files=["junit_check.py"], runner=runner)
+        self.authorize()
+        self.apply("run-start", role="implementer", actor="author")
+        run = self.task.current_run(self.task.load())
+        script = self.repo / "junit_check.py"
+        script.write_text(
+            "import os, subprocess, sys, xml.etree.ElementTree as ET\n"
+            "greeting = subprocess.check_output([sys.executable, 'app.py'], text=True).strip()\n"
+            "mode = os.getenv('METHOD_JUNIT_FIXTURE', 'run')\n"
+            "suite = ET.Element('testsuite')\n"
+            "if mode != 'empty':\n"
+            "    case = ET.SubElement(suite, 'testcase', name='greeting', classname='CLI')\n"
+            "    if mode != 'no-source': case.set('file', 'other.py' if mode == 'other' else 'junit_check.py')\n"
+            "    if mode == 'skip': ET.SubElement(case, 'skipped')\n"
+            "    if not greeting: ET.SubElement(case, 'failure')\n"
+            "if mode != 'absent': ET.ElementTree(suite).write(sys.argv[1])\n"
+            "sys.exit(0 if greeting else 1)\n")
+        self.apply("baseline", run=run["id"], scenario="V01", safe_to_record=True,
+                   format="junit", selector="CLI.greeting", argv=[*runner, "{report}"])
+        self.apply("run-finish", run=run["id"], status="completed", processes_stopped=True, summary="Characterization")
+        self.apply("candidate", paths=[script.name])
+        self.apply("run-start", role="verifier", actor="verifier")
+        run = self.task.current_run(self.task.load())
+        for mode in ("run", "absent", "empty", "skip", "other", "no-source"):
+            with self.subTest(mode=mode), patch.dict(os.environ, {"METHOD_JUNIT_FIXTURE": mode}):
+                self.apply("test", run=run["id"], scenario="V01", safe_to_record=True)
+                output = self.task.current_run(self.task.load())["evidence"][-1]
+                self.assertEqual(output["outcome"], "pass" if mode == "run" else "unverified")
+                if mode == "run":
+                    self.assertIn(b'<testcase name="greeting"', self.task.read_evidence(output))
+
+    def test_selected_skip_supersedes_earlier_pass(self):
+        self.prepare()
+        self.authorize()
+        self.implementation()
+        self.apply("run-start", role="verifier", actor="independent")
+        run = self.task.current_run(self.task.load())
+        self.run_greeting(run, "pass")
+        self.run_greeting(run, "unverified")
+        evidence = self.task.current_run(self.task.load())["evidence"]
+        self.assertEqual([e["outcome"] for e in evidence], ["pass", "unverified"])
+        for attempt in evidence:
+            with self.assertRaisesRegex(Error, "selected test"):
+                self.apply("verify", run=run["id"], processes_stopped=True,
+                           results=[{"id": "V01", "outcome": "pass", "observed": "Run finished",
+                                     "evidence": [attempt["id"]]}],
+                           findings=[], review="Checked CLI", launch="python3 app.py", tradeoffs="Existing CLI")
+
+    def test_red_baseline_pins_assertion_through_repair_and_capture(self):
+        file = "tests/check_greeting.py"
+        self.prepare(baseline="fail", test_files=[file])
+        self.authorize()
+        self.apply("run-start", role="implementer", actor="author")
+        run = self.task.current_run(self.task.load())
+        probe = self.repo / file
+        probe.parent.mkdir()
+        probe.write_text("import subprocess, sys\n"
+                         "output = subprocess.check_output([sys.executable, 'app.py'], text=True)\n"
+                         "correct = output.strip() == 'hello, world'\n"
+                         "print('1..1')\nprint(('ok' if correct else 'not ok') + ' 1 - greeting')\n"
+                         "sys.exit(0 if correct else 1)\n")
+        binding = dict(run=run["id"], scenario="V01", safe_to_record=True, format="tap",
+                       selector="greeting", argv=["python3", "-B", file])
+        app = self.repo / "app.py"
+        original = app.read_bytes()
+        app.write_text("print('premature product edit')\n")
+        git(self.repo, "add", "app.py")
+        app.write_bytes(original)
+        with self.assertRaisesRegex(Error, "before the test baseline"):
+            self.apply("baseline", **binding)
+        git(self.repo, "add", "app.py")
+        self.apply("baseline", **binding)
+        checkpoint = self.task.load()["test_baselines"]["V01"]
+        self.assertEqual(checkpoint["outcome"], "fail")
+        self.assertEqual(self.task.read_blob(checkpoint["files"][file]), probe.read_bytes())
+        app.write_text("print('hello, world')\n")
+        probe.write_text(probe.read_text().replace("output.strip()", "output.rstrip('\\n')"))
+        finish = dict(run=run["id"], status="completed", summary="Revised assertion", processes_stopped=True)
+        with self.assertRaisesRegex(Error, "changed since its baseline"):
+            self.apply("run-finish", **finish)
+        baseline_repo = self.root / "original with revised tests"
+        git(self.root, "clone", "--quiet", "-b", "main", str(self.repo), str(baseline_repo))
+        (baseline_repo / file).parent.mkdir()
+        shutil.copy2(probe, baseline_repo / file)
+        self.apply("baseline", **binding, workspace=str(baseline_repo), reason="Preserve significant whitespace")
+        self.apply("run-finish", **finish)
+        self.apply("candidate", paths=["app.py", file])
+        self.apply("run-start", role="verifier", actor="verifier")
+        run = self.task.current_run(self.task.load())
+        cli = [sys.executable, str(SCRIPTS / "method.py"), "test", "--input", "-"]
+        result = subprocess.run(cli, input=json.dumps(dict(run=run["id"], scenario="V01", safe_to_record=True)),
+                                cwd=self.repo, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        evidence = self.task.current_run(self.task.load())["evidence"][-1]
+        self.assertEqual(evidence["outcome"], "pass")
+        self.apply("verify", run=run["id"], processes_stopped=True,
+                   results=[{"id": "V01", "outcome": "pass", "observed": "Expected CLI greeting",
+                             "evidence": [evidence["id"]]}],
+                   findings=[], review="Compared assertion to requirement", launch="python3 app.py", tradeoffs="CLI")
+        self.assertEqual(self.task.view()["status"], "human_review")
+
+    def test_unavailable_on_demand_baseline_still_requires_candidate_execution(self):
+        self.prepare()
+        self.authorize()
+        self.apply("run-start", role="implementer", actor="author")
+        run = self.task.current_run(self.task.load())
+        self.apply("baseline", run=run["id"], scenario="V01", safe_to_record=True,
+                   unavailable="Test service is offline", **GREETING_RUN)
+        self.apply("run-finish", run=run["id"], status="completed", processes_stopped=True, summary="Service still offline")
+        self.apply("candidate", paths=[])
+        case = self.task.load()["candidates"][-1]["test_baselines"]["V01"]
+        self.assertEqual(case["outcome"], "unverified")
+        self.assertIsNone(case["evidence"])
+        self.verification(outcome="unverified")
+        self.assertFalse(self.task.load()["candidates"][-1]["verification"]["ready"])
+        self.authorize(mode="evidence")
+        self.verification(actor="service-restored")
+        self.assertEqual(self.task.view()["status"], "human_review")
+
     def test_verifier_identity_must_be_fresh_across_rounds_and_authorizations(self):
         self.prepare(); self.authorize()
         self.implementation()
@@ -1259,7 +1534,7 @@ class MethodTests(unittest.TestCase):
 
     def test_candidate_must_belong_to_current_authorization(self):
         self.prepare(); self.authorize()
-        self.apply("run-start", role="implementer", actor="old-implementer")
+        self.start_implementation("old-implementer")
         run = self.task.current_run(self.task.load())
         self.apply("run-finish", run=run["id"], status="completed",
                    processes_stopped=True, summary="Uncaptured implementation.")
@@ -1306,7 +1581,7 @@ class MethodTests(unittest.TestCase):
                 self.authorize(mode="evidence", minutes=1)
                 self.apply("run-start", role="verifier", actor="boundary-" + outcome)
                 run = self.task.current_run(self.task.load())
-                self.apply("command", run=run["id"], argv=[sys.executable, "app.py"], safe_to_record=True)
+                self.run_greeting(run, outcome)
                 run = self.task.current_run(self.task.load())
                 with patch("core.time.time", side_effect=[run["started_epoch"] + 59.9, run["started_epoch"] + 60.1]):
                     self.apply("verify", run=run["id"], processes_stopped=True,
@@ -1671,7 +1946,7 @@ class MethodTests(unittest.TestCase):
 
     def test_known_checkpoint_recovery_does_not_duplicate_commit(self):
         self.prepare(); self.authorize()
-        self.apply("run-start", role="implementer", actor="i")
+        self.start_implementation("i")
         run = self.task.current_run(self.task.load())
         self.apply("run-finish", run=run["id"], status="completed", summary="No changes; commands finished", processes_stopped=True)
         self.assertEqual(self.task.view()["status"], "candidate")
@@ -1893,7 +2168,7 @@ class MethodTests(unittest.TestCase):
 
     def test_candidate_rejects_unlisted_staged_files_without_discarding(self):
         self.prepare(); self.authorize()
-        self.apply("run-start", role="implementer", actor="i")
+        self.start_implementation("i")
         run=self.task.current_run(self.task.load())
         (self.repo / "app.py").write_text("print('changed')\n")
         (self.repo / "unexpected.txt").write_text("Keep this staged content")

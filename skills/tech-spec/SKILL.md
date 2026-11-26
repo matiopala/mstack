@@ -88,13 +88,12 @@ requirements or design details.
 
 ## 5. Connect the design to verification
 
-Read the verification plan and map the proposed solution to its scenario
-identifiers. Use [design-verification](../design-verification/SKILL.md) when
+Map the proposed solution to accepted scenarios and existing tests. Use [design-verification](../design-verification/SKILL.md) when
 detailed verification design is missing or materially incomplete, including
 newly discovered failure or compatibility obligations.
 
-Keep technical decisions in this specification and reference the separate
-verification plan for required outcomes and evidence. A design revision may
+Keep technical decisions in this specification and reference the acceptance criteria
+and test selectors wherever they are maintained. A design revision may
 change execution details without changing those outcomes. Explain and resolve
 requirement revisions rather than quietly accommodating the new design.
 Record actual check results separately during implementation.

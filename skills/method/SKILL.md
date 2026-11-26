@@ -76,6 +76,8 @@ events, or state directly to unlock a transition. Revisions use `submit`.
 - Use a fresh implementer; give each verification round a fresh independent
   verifier. Supply artifact-only context. This authorizes those roles, not recursive
   delegation. If the host lacks independent agents, record `block`; do not self-review.
+- Checkpoint repository tests against the original product before product edits.
+  Rerun the selected tests in the verifier checkout.
 - Source changes require a new candidate and fresh verification. Requirements
   changes stop execution and require affected preparation approvals again.
 - Honor execution limits across repairs and restarts. Stop owned agents/commands

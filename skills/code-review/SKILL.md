@@ -42,7 +42,9 @@ acceptance criteria hold under the stated test conditions.
 Check that supplied evidence covers the intended behavior through meaningful
 user or system entry points, including required side effects. It should identify
 the tested code state, prerequisites, steps or commands, expected and observed
-results, and relevant limitations or mocks. Manual evidence is valid.
+results, and relevant limitations or mocks. Manual evidence can support human judgments. For automated acceptance, check
+the named test's baseline, candidate result, and whether it actually executed.
+Check changed assertions against the requirement.
 
 Inspect what the cited checks and artifacts actually demonstrate. A green CI
 badge, "tested locally," or instructions without observed results are
