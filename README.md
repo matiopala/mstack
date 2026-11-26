@@ -20,6 +20,7 @@ supports Codex, Pi, Claude Code, and Google Antigravity.
 | [`catch-up`](skills/catch-up/SKILL.md) | Catch up on progress and pending decisions, with enough context to act. |
 | [`code-review`](skills/code-review/SKILL.md) | Review a PR for proof it works, regression risks, and simple, maintainable code. |
 | [`conventional-commits`](skills/conventional-commits/SKILL.md) | Prepare focused Git commits with clear Conventional Commit messages. |
+| [`correct`](skills/correct/SKILL.md) | Turn a demonstrated engineering mistake into a repository fix and prove the check catches a recurrence. |
 | [`create-verification-skill`](skills/create-verification-skill/SKILL.md) | Create reusable, project-local instructions for driving the real app and collecting proof. |
 | [`decompose`](skills/decompose/SKILL.md) | Split a bigger design into reviewable tasks with clear acceptance criteria and proof of completion. |
 | [`deep-plan`](skills/deep-plan/SKILL.md) | Plan a change whose approach depends on an uncertain assumption, carrying evidence between rounds. |
@@ -41,6 +42,7 @@ supports Codex, Pi, Claude Code, and Google Antigravity.
 | [`session-review`](skills/session-review/SKILL.md) | Learn from selected coding sessions and identify evidence-backed workflow improvements. |
 | [`show-me`](skills/show-me/SKILL.md) | Get a focused visual explanation. |
 | [`tech-spec`](skills/tech-spec/SKILL.md) | Describe how a feature should work technically and how to prove it works. |
+| [`uncomment`](skills/uncomment/SKILL.md) | Remove redundant comments and private docstrings while preserving contracts, rationale, and tool-consumed text. |
 
 Use `prototype` to try an idea or answer a question through working code.
 It iterates toward the goal and checks that outcome, without a mandatory
@@ -156,6 +158,9 @@ it does not automatically edit skills or project guidance.
 - `bro` is adapted from [backnotprop/bro](https://github.com/backnotprop/bro).
 - `catch-up` is inspired by
   [pstack's ketchup](https://github.com/cursor/plugins/blob/main/pstack/skills/ketchup/SKILL.md).
+- `correct` and `uncomment` adapt Lauren Tan's
+  [correct](https://github.com/cursor/plugins/blob/main/pstack/skills/correct/SKILL.md) and
+  [no-comments](https://github.com/cursor/plugins/blob/main/pstack/skills/no-comments/SKILL.md).
 - `create-verification-skill` and `maintain-verification-skill` are adapted from
   [pstack's creation](https://github.com/cursor/plugins/blob/main/pstack/skills/create-verification-skill/SKILL.md)
   and [maintenance](https://github.com/cursor/plugins/blob/main/pstack/skills/maintain-verification-skill/SKILL.md)
@@ -303,6 +308,8 @@ Licensed under the [Apache License 2.0](LICENSE), except for these MIT-licensed
 adaptations:
 
 - [`handoff`](skills/handoff/LICENSE)
+- [`correct`](skills/correct/LICENSE)
+- [`uncomment`](skills/uncomment/LICENSE)
 - [`in-your-own-words`](skills/in-your-own-words/LICENSE)
 - [`create-verification-skill`](skills/create-verification-skill/LICENSE)
 - [`maintain-verification-skill`](skills/maintain-verification-skill/LICENSE)
